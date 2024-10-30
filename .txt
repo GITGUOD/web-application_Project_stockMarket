@@ -1,0 +1,3 @@
+This will be my first trading bot
+
+I will program a simple trading bot that uses fibonacci 50% retracement
