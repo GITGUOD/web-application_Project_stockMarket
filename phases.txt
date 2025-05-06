@@ -1,0 +1,29 @@
+Phase 1:
+
+The first goal is to get real-time and historical data for our stocks into the system.
+
+Tasks:
+Choosing a data provider:
+- Preferebly free such as Yahoo Finance
+
+Python script to:
+- Fetching historical data prices such as:
+    - Daily,yearly and weekly data timeframes.
+    - Stream live prices if available
+Storing data:
+- Database: SQLite
+
+Phase 2:
+Goal: Building a simple Machine-Learning model to predict short-term price movements
+
+Tasks: Unknown:
+
+Phase 3:
+Goal: Exposing data and predictions via APIs
+
+Tasks: Not yet to be found
+
+Phase 4: Frontend (React + TypeScript)
+Goal: Building a clean UI for showing stock data and predictions:
+
+Tasks: Not yet to be found
