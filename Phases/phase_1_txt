@@ -1,0 +1,23 @@
+Hello, welcome to phase 1:
+
+I will document my progress through phase 1:
+
+https://pypi.org/project/yfinance/
+Chose Yahoo Finance as our data provider
+
+Here's our guide on the installation
+https://ranaroussi.github.io/yfinance/
+
+Configuration on windows:
+
+Installing yfinance:
+pip install yfinance
+
+Installing Pythonscript for mySQL:
+
+pip install mysql-connector-python
+
+
+Setting up mysql:
+
+Downloading benchwork and mysqlserver to establish a server and connection
