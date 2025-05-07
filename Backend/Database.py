@@ -67,6 +67,20 @@ class Database:
         for symbol, name in tickers:
             self.insert_ticker(symbol, name)
 
+    #Inserting prices into the database
+    def insert_price(self, ticketSymbol, timeframe, date, open_price, high_price, low_price, close_price, volume):
+        """Inserts stock price data into the database."""
+        try:
+            self.cursor.execute("""
+                INSERT INTO price (ticketSymbol, timeframe, date, open, high, low, close, volume)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                ON DUPLICATE KEY UPDATE open=%s, high=%s, low=%s, close=%s, volume=%s
+            """, (ticketSymbol, timeframe, date, open_price, high_price, low_price, close_price, volume,
+                  open_price, high_price, low_price, close_price, volume))
+            self.conn.commit()
+        except Exception as e:
+            print(f"Failed to insert price data for {ticketSymbol} on {date}: {e}")
+
     #Closing the connection
     def close(self):
         self.cursor.close()
