@@ -21,3 +21,5 @@ pip install mysql-connector-python
 Setting up mysql:
 
 Downloading benchwork and mysqlserver to establish a server and connection
+
+Following this youtube video: https://www.youtube.com/watch?v=hiS_mWZmmI0
