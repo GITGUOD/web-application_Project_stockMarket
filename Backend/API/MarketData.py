@@ -1,7 +1,6 @@
 import yfinance as yf # Quick start
+import Database
 dat = yf.Ticker("MSFT")
-import matplotlib.pyplot as plt
-
 
 #API Reference: https://ranaroussi.github.io/yfinance/reference/index.html
 
@@ -17,13 +16,18 @@ print(data.head())
 
 print(data.columns)
 
+#We need a list of stocks:
 
-# Plot closing prices
-data['Close'].plot(figsize=(10, 5))
-plt.title("Stock Closing Prices - Last 1 Month")
-plt.ylabel("Price (USD)")
-plt.grid(True)
-plt.show()
+tickers = [("MSFT", "Microsoft Corporation"),
+           ("AAPL", "Apple Inc."),
+           ("GOOGL", "Alphabet Inc."),
+           ("TSLA", "Tesla Inc.")
+           ]
+
+for symbol, name in tickers:
+    cursor.execute("INSERT IGNORE INTO tickers (symbol, name) VALUES (%s, %s)", (symbol, name))
+
+conn.commit()
 
 
 
