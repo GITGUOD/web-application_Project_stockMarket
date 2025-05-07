@@ -17,7 +17,7 @@ class Database:
         self.cursor.execute(f"CREATE DATABASE IF NOT EXISTS {database}")
         self.conn.database = database  # Connect to the database
 
-        # Create the table "tickers" which will be used to add stocks if it doesn't exist
+        # Create the table "stock" which will be used to add stocks if it doesn't exist
         self.cursor.execute("""
             CREATE TABLE stock (
                 ticketSymbol VARCHAR(10) PRIMARY KEY,
@@ -26,15 +26,18 @@ class Database:
             );
         """)
 
-        # Create table for time frames such as daily, weekly, monthly etc
+        # Create table for ticket
         self.cursor.execute("""
-            CREATE TABLE IF NOT EXISTS timeframes (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                timeframe VARCHAR(20) not NULL UNIQUE
-            )
+            CREATE TABLE ticket (
+                ticketSymbol VARCHAR(10),
+                timeframe VARCHAR(20),
+                PRIMARY KEY (ticketSymbol, timeframe),
+                FOREIGN KEY (ticketSymbol) REFERENCES stock(ticketSymbol)
+            );
+
         """)
 
-        # Create table for stock prices with reference to timeframe
+        # Create table for stock prices with timeframes, opening prices etc
         self.cursor.execute("""
             CREATE TABLE price (
                 ticketSymbol VARCHAR(10),
