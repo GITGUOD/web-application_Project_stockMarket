@@ -19,11 +19,36 @@ class Database:
 
         # Create the table "tickers" which will be used to add stocks if it doesn't exist
         self.cursor.execute("""
-            CREATE TABLE IF NOT EXISTS tickers (
+            CREATE TABLE stock (
+                ticketSymbol VARCHAR(10) PRIMARY KEY,
+                name VARCHAR(100),
+                -- any other stock related metadata
+            );
+        """)
+
+        # Create table for time frames such as daily, weekly, monthly etc
+        self.cursor.execute("""
+            CREATE TABLE IF NOT EXISTS timeframes (
                 id INT AUTO_INCREMENT PRIMARY KEY,
-                symbol VARCHAR(10) NOT NULL UNIQUE,
-                name VARCHAR(100)
+                timeframe VARCHAR(20) not NULL UNIQUE
             )
+        """)
+
+        # Create table for stock prices with reference to timeframe
+        self.cursor.execute("""
+            CREATE TABLE price (
+                ticketSymbol VARCHAR(10),
+                timeframe VARCHAR(20),
+                date DATE,
+                open FLOAT,
+                high FLOAT,
+                low FLOAT,
+                close FLOAT,
+                volume BIGINT,
+                PRIMARY KEY (ticketSymbol, timeframe, date),
+                FOREIGN KEY (ticketSymbol, timeframe) REFERENCES ticket(ticketSymbol, timeframe)
+            );
+
         """)
 
     #Inserting stocks into the table TICKERS
