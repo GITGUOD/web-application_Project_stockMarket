@@ -1,5 +1,12 @@
 import yfinance as yf # Quick start
 import Database
+
+class MarketData:
+    def __init__(self, db: Database):
+        self.db = db
+
+
+
 dat = yf.Ticker("MSFT")
 
 #API Reference: https://ranaroussi.github.io/yfinance/reference/index.html
