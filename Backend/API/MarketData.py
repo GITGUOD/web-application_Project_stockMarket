@@ -1,5 +1,6 @@
 import yfinance as yf # YFinance API, importing data
-from .. import Database
+#from .. import Database
+from Backend.Database import Database  # clearer and safer
 
 
 #API Reference: https://ranaroussi.github.io/yfinance/reference/index.html
