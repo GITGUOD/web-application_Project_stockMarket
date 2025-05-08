@@ -80,6 +80,16 @@ class Database:
         except Exception as e:
             print(f"Failed to insert price data for {ticketSymbol} on {date}: {e}")
 
+    def get_prices_for_ticker(self, symbol, timeframe="1d"):
+        self.cursor.execute("""
+            SELECT date, open, high, low, close, volume 
+            FROM price 
+            WHERE ticketSymbol = %s AND timeframe = %s 
+            ORDER BY date ASC
+        """, (symbol, timeframe))
+        return self.cursor.fetchall()
+
+
     #Closing the connection
     def close(self):
         self.cursor.close()
