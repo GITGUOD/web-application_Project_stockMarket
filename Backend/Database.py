@@ -19,16 +19,15 @@ class Database:
 
         # Create the table "stock" which will be used to add stocks if it doesn't exist
         self.cursor.execute("""
-            CREATE TABLE stock (
+            CREATE TABLE IF NOT EXISTS stock (
                 ticketSymbol VARCHAR(10) PRIMARY KEY,
-                name VARCHAR(100),
-                -- any other stock related metadata
+                name VARCHAR(100)
             );
         """)
 
         # Create table for ticket
         self.cursor.execute("""
-            CREATE TABLE ticket (
+            CREATE TABLE IF NOT EXISTS ticket (
                 ticketSymbol VARCHAR(10),
                 timeframe VARCHAR(20),
                 PRIMARY KEY (ticketSymbol, timeframe),
@@ -39,7 +38,7 @@ class Database:
 
         # Create table for stock prices with timeframes, opening prices etc
         self.cursor.execute("""
-            CREATE TABLE price (
+            CREATE TABLE IF NOT EXISTS price (
                 ticketSymbol VARCHAR(10),
                 timeframe VARCHAR(20),
                 date DATE,
@@ -57,15 +56,15 @@ class Database:
     #Inserting stocks into the table TICKERS
     def insert_ticker(self, symbol, name):
         self.cursor.execute(
-            "INSERT IGNORE INTO tickers (symbol, name) VALUES (%s, %s)",
-            (symbol, name)
+            "INSERT IGNORE INTO stock (ticketSymbol, name) VALUES (%s, %s)",
+            (symbol.upper(), name)
         )
         self.conn.commit()
 
     #Inserting multple stocks
     def insert_multiple_tickers(self, tickers):
         for symbol, name in tickers:
-            self.insert_ticker(symbol, name)
+            self.insert_ticker(symbol.upper(), name) #Symbol.upper() will make sure that simple the uppercase, ticketsymbol will be added. So instead of the whole Microsoft Inc etc only the four letters will be added
 
     #Inserting prices into the database
     def insert_price(self, ticketSymbol, timeframe, date, open_price, high_price, low_price, close_price, volume):

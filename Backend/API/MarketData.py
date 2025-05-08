@@ -1,6 +1,6 @@
 import yfinance as yf # YFinance API, importing data
 #from .. import Database
-from Backend.Database import Database  # clearer and safer
+from Backend.Database import Database
 
 
 #API Reference: https://ranaroussi.github.io/yfinance/reference/index.html
@@ -21,7 +21,7 @@ class MarketData:
            ("AMZN", "Amazon.com Inc.")
            ]
         
-        for symbol in tickers:
+        for symbol, _ in tickers: #Packing up each String as a tuple, without ', _' both MSFT and Microsoft Corporation would be treated one way which we don't want to
             try:
                 #Using all ticker objects in our vector and adding them to the database by fetching the method from our db class
                 ticker = yf.Ticker(symbol)
