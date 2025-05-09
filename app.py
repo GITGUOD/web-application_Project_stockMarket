@@ -6,6 +6,10 @@ def main():
     db = Database()
     market_data = MarketData(db)
     market_data.load_sample_tickers()
+    # List of symbols to load historical stock data for
+    symbols = ["MSFT", "AAPL", "GOOGL", "TSLA", "NVDA", "AMZN"]
+    for symbol in symbols:
+        market_data.load_stock_data(symbol)
     db.close()
 
 app = Flask(__name__)
@@ -25,11 +29,6 @@ def get_stock_prices(symbol):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-
-# Serve favicon (optional)
-@app.route('/favicon.ico')
-def favicon():
-    return send_from_directory('static', 'favicon.ico')
 
 if __name__ == "__main__":
     main()
