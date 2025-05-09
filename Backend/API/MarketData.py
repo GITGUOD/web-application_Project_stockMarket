@@ -12,14 +12,9 @@ class MarketData:
         self.db = db
 
     def load_sample_tickers(self):
-        # Adding tickers and fetching company data using yfinance API
-        tickers = [("MSFT", "Microsoft Corporation"),
-           ("AAPL", "Apple Inc."),
-           ("GOOGL", "Alphabet Inc."),
-           ("TSLA", "Tesla Inc."),
-           ("NVDA", "Nvidia Corporation."),
-           ("AMZN", "Amazon.com Inc.")
-           ]
+        # Fetching company data using yfinance API
+        
+        tickers = self.get_samples()
         
         for symbol, _ in tickers: #Packing up each String as a tuple, without ', _' both MSFT and Microsoft Corporation would be treated one way which we don't want to
             try:
@@ -29,6 +24,18 @@ class MarketData:
                 self.db.insert_ticker(symbol, name)
             except Exception as e:
                 print(f"Failed to insert {symbol}: {e}")
+    
+    #Adding tickers
+    def get_samples():
+        tickers = [("MSFT", "Microsoft Corporation"),
+           ("AAPL", "Apple Inc."),
+           ("GOOGL", "Alphabet Inc."),
+           ("TSLA", "Tesla Inc."),
+           ("NVDA", "Nvidia Corporation."),
+           ("AMZN", "Amazon.com Inc.")
+           ]
+        return tickers
+        
     
     def load_stock_data(self, symbol):
         #Fetching historical price stock data from Yahoo Finance
@@ -50,6 +57,11 @@ class MarketData:
                 self.db.insert_price(symbol, "1d", date_str, open_price, high_price, low_price, close_price, volume)  # '1d' is the timeframe example
         except Exception as e:
             print(f"Failed to load stock data for {symbol}: {e}")
+
+    def load_all_sample_data(self):
+        tickers = self.get_samples()  # Eller MarketData.get_samples() om det är en statisk metod
+        for symbol, _ in tickers:
+            self.load_stock_data(symbol)
 
     def close(self):
         self.db.close()

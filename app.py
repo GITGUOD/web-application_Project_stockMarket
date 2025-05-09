@@ -6,10 +6,7 @@ def main():
     db = Database()
     market_data = MarketData(db)
     market_data.load_sample_tickers()
-    # List of symbols to load historical stock data for
-    symbols = ["MSFT", "AAPL", "GOOGL", "TSLA", "NVDA", "AMZN"]
-    for symbol in symbols:
-        market_data.load_stock_data(symbol)
+    market_data.load_all_sample_data()
     db.close()
 
 app = Flask(__name__)
