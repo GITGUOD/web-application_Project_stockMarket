@@ -26,6 +26,7 @@ class MarketData:
                 print(f"Failed to insert {symbol}: {e}")
     
     #Adding tickers
+    @staticmethod
     def get_samples():
         tickers = [("MSFT", "Microsoft Corporation"),
            ("AAPL", "Apple Inc."),

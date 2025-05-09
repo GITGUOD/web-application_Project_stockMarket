@@ -55,11 +55,18 @@ class Database:
 
     #Inserting stocks into the table TICKERS
     def insert_ticker(self, symbol, name):
+        symbol = symbol.upper()
         self.cursor.execute(
             "INSERT IGNORE INTO stock (ticketSymbol, name) VALUES (%s, %s)",
-            (symbol.upper(), name)
+            (symbol, name)
+        )
+        self.cursor.execute(
+            "INSERT IGNORE INTO ticket (ticketSymbol, timeframe) VALUES (%s, %s)",
+            (symbol, "1d")
         )
         self.conn.commit()
+
+        
 
     #Inserting multple stocks
     def insert_multiple_tickers(self, tickers):
@@ -80,6 +87,7 @@ class Database:
         except Exception as e:
             print(f"Failed to insert price data for {ticketSymbol} on {date}: {e}")
 
+#Getting prices for the specific stock
     def get_prices_for_ticker(self, symbol, timeframe="1d"):
         self.cursor.execute("""
             SELECT date, open, high, low, close, volume 
