@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, send_from_directory
+from flask import Flask, jsonify, render_template
 from Backend.Database import Database
 from Backend.API.MarketData import MarketData
 
@@ -9,19 +9,26 @@ def main():
     market_data.load_all_sample_data()
     db.close()
 
-app = Flask(__name__)
+#Hämtar html filen
+app = Flask(__name__, template_folder='frontend')
 db = Database()
 
 @app.route('/')
 def home():
-    return "Welcome to the Stock Market App!"
+    return render_template("newStocks.html")  # Visa din HTML-sida här
+
 
 @app.route("/stock/<symbol>/prices")
 def get_stock_prices(symbol):
     try:
         data = db.get_prices_for_ticker(symbol)
+
         if not data:
             return jsonify({"error": "No data found for symbol"}), 404
+        
+        #Get stock name
+        stock_name = db.get_stock_name(symbol)
+
         return jsonify(data)
     except Exception as e:
         return jsonify({"error": str(e)}), 500

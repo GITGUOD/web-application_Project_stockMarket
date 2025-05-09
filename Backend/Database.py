@@ -53,7 +53,7 @@ class Database:
 
         """)
 
-    #Inserting stocks into the table TICKERS
+    #Inserting stocks
     def insert_ticker(self, symbol, name):
         symbol = symbol.upper()
         self.cursor.execute(
@@ -96,6 +96,11 @@ class Database:
             ORDER BY date ASC
         """, (symbol, timeframe))
         return self.cursor.fetchall()
+    
+    def get_stock_name(self, symbol):
+        self.cursor.execute("SELECT name FROM stock WHERE ticketSymbol = %s", (symbol,))
+        result = self.cursor.fetchone()
+        return result[0] if result else "Unknown"
 
 
     #Closing the connection

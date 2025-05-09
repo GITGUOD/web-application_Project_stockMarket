@@ -1,0 +1,66 @@
+/* Grundläggande stil för hela sidan */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    margin: 0;
+    padding: 0;
+}
+
+/* Rubrik stil */
+h1 {
+    text-align: center;
+    color: #333;
+    padding-top: 30px;
+    font-size: 2.5em;
+}
+
+/* För aktiens namn */
+h2 {
+    text-align: center;
+    color: #555;
+    font-size: 1.5em;
+    margin-top: 20px;
+}
+
+/* Tabellens stil */
+table {
+    width: 80%;
+    margin: 30px auto;
+    border-collapse: collapse;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+}
+
+/* Tabellens header */
+th {
+    background-color: #007BFF;
+    color: white;
+    padding: 10px;
+    text-align: left;
+    font-size: 1.1em;
+}
+
+/* Tabellrader */
+td {
+    padding: 10px;
+    text-align: left;
+    font-size: 1em;
+    border-bottom: 1px solid #ddd;
+}
+
+/* När man håller muspekaren över en tabellrad */
+tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Stilar för knappar om du vill använda dem senare */
+button {
+    background-color: #28a745;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    cursor: pointer;
+    font-size: 1em;
+    border-radius: 5px;
+    margin: 10px
+}
