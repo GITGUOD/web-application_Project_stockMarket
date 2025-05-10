@@ -15,7 +15,7 @@ db = Database()
 
 @app.route('/')
 def home():
-    return render_template("newStock.html")  # Visa din HTML-sida här
+    return render_template("StockSite.html")  # Visa din HTML-sida här
 
 
 @app.route("/stock/<symbol>/prices")
