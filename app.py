@@ -15,7 +15,7 @@ db = Database()
 
 @app.route('/')
 def home():
-    return render_template("newStocks.html")  # Visa din HTML-sida här
+    return render_template("newStock.html")  # Visa din HTML-sida här
 
 
 @app.route("/stock/<symbol>/prices")
@@ -27,7 +27,8 @@ def get_stock_prices(symbol):
             return jsonify({"error": "No data found for symbol"}), 404
         
         #Get stock name
-        stock_name = db.get_stock_name(symbol)
+        #stock_name = db.get_stock_name(symbol)
+        #print(stock_name)
 
         return jsonify(data)
     except Exception as e:

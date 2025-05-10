@@ -6,7 +6,9 @@
     <title>Stock Prices</title>
 </head>
 <body>
-    <h1>Stock Prices</h1>
+    <!-- Sätt aktie namnet under -->
+
+    <h1>Stock Prices For AAPL</h1>
 
     <!-- En tabell för att visa aktiekurser -->
     <table id="stockTable">
@@ -26,7 +28,7 @@
     </table>
 
     <script>
-        const symbol = "AAPL";  // Sätt till den aktiesymbol du vill hämta data för
+        const symbol = "AAPL";  // Sätt till den aktiesymbol du vill hämta data för, här hämtar vi för APPL
 
         // Gör en begäran till API:et för att hämta aktiekurser för symbolen
         fetch(`/stock/${symbol}/prices`)

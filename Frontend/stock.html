@@ -3,16 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stock Prices</title>
+    <title>{{ symbol }} Stock Prices</title>
 </head>
 <body>
-    <h1>Stock Prices</h1>
-
-    <!-- Aktiens namn visas här -->
-    <h2 id="stockName"></h2>
-
-    <!-- En tabell för att visa aktiekurser -->
-    <table id="stockTable">
+    <h1>Stock Prices for {{ symbol }}</h1>
+    <table border="1">
         <thead>
             <tr>
                 <th>Date</th>
@@ -24,47 +19,17 @@
             </tr>
         </thead>
         <tbody>
-            <!-- Här kommer tabellraderna att läggas till dynamiskt -->
+            {% for price in prices %}
+                <tr>
+                    <td>{{ price[0] }}</td>
+                    <td>{{ price[1] }}</td>
+                    <td>{{ price[2] }}</td>
+                    <td>{{ price[3] }}</td>
+                    <td>{{ price[4] }}</td>
+                    <td>{{ price[5] }}</td>
+                </tr>
+            {% endfor %}
         </tbody>
     </table>
-
-    <script>
-        const symbol = "AAPL";  // Sätt till den aktiesymbol du vill hämta data för
-
-        // Gör en begäran till API:et för att hämta aktiekurser för symbolen
-        fetch(`/stock/${symbol}/prices`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.error) {
-                    // Om det inte finns någon data, visa ett felmeddelande
-                    alert(data.error);
-                } else {
-                    // Visa aktiens namn
-                    const stockNameElement = document.getElementById("stockName");
-                    stockNameElement.textContent = `Stock: ${data.name}`;
-
-                    // Hämta tabellens body (där vi kommer att lägga till rader)
-                    const tableBody = document.querySelector("#stockTable tbody");
-
-                    // För varje rad i datan, skapa en ny tabellrad och fyll den med information
-                    data.prices.forEach(row => {
-                        const tr = document.createElement("tr");
-                        tr.innerHTML = `
-                            <td>${row[0]}</td>
-                            <td>${row[1]}</td>
-                            <td>${row[2]}</td>
-                            <td>${row[3]}</td>
-                            <td>${row[4]}</td>
-                            <td>${row[5]}</td>
-                        `;
-                        tableBody.appendChild(tr);  // Lägg till raden i tabellen
-                    });
-                }
-            })
-            .catch(error => {
-                // Hantera eventuella fel som kan uppstå vid API-anropet
-                alert("Error: " + error);
-            });
-    </script>
 </body>
 </html>
