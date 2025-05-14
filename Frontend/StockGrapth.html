@@ -10,9 +10,18 @@
 
 <body>
     <h2>Stock Price Chart</h2>
+
+    <select id="stockSelector">
+    <option value="AAPL">AAPL</option>
+    <option value="TSLA">TSLA</option>
+    <option value="MSFT">MSFT</option>
+    </select>
+
     <canvas id="stockChart" width="800" height="400"></canvas>
 
     <script>
+        let chart;
+
         async function loadChart(symbol) {
             const response = await fetch(`/stock/${symbol}/prices`);
             if (!response.ok) {
@@ -35,9 +44,12 @@
             const volumes = data.map(item => item[5]);           // Volume finns på index 5
 
 
-
+            //Destroy the chart if it already exist, useful when swapping charts
+            if (chart) {
+            chart.destroy();
+            }
             const ctx = document.getElementById('stockChart').getContext('2d');
-            new Chart(ctx, {
+            chart = new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: dates,
@@ -131,6 +143,10 @@
                 }
             });
         }
+
+        document.getElementById('stockSelector').addEventListener('change', function () {
+        loadChart(this.value);
+        });
 
         loadChart('AAPL');
     </script>

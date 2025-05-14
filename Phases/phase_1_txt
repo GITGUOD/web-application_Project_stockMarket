@@ -8,7 +8,7 @@ Chose Yahoo Finance as our data provider
 Here's our guide on the installation
 https://ranaroussi.github.io/yfinance/
 
-Configuration on windows:
+1. Configuration on windows:
 
 Installing yfinance:
 pip install yfinance
@@ -18,8 +18,47 @@ Installing Pythonscript for mySQL:
 pip install mysql-connector-python
 
 
-Setting up mysql:
+2. Setting up mysql:
 
 Downloading benchwork and mysqlserver to establish a server and connection
 
 Following this youtube video: https://www.youtube.com/watch?v=hiS_mWZmmI0
+
+After downloading the server and shell from the website
+
+We set up the environment variable by copying the path to the mysql bin file
+
+Now we should have established a connection to the database and by running the database.py, we created the Table 'tickers'
+
+3. Writing code for fetching stock data into our database with python scripts and
+utilizing the free yfinance API from Yahoo finance.
+
+Structuring code and rewriting it, making it cleaner and easier to use, with use
+I meant less duplicate codes¨
+
+To create relevant tables, I will now draw the UML diagrams as seen in the folder UML_Diagram
+
+Adding python script to fetch historical data and add to the database
+
+Plans for the future:
+- Adding a docker to the prototype
+
+
+4. Use the added data to create my application, adding graphs etc.
+- Trying out flask, installed it by: pip install flask and updating python to the latest versions
+
+http://127.0.0.1:5000/ to check the website
+
+http://127.0.0.1:5000/stock/MSFT/prices
+To check microsoft data
+
+http://localhost:5000/stock/AAPL/prices
+To check apple price stock data
+
+created a new folder: static which is a default folder for Flask to utilize its non-dynamic files
+
+Added the feature where the grapth is now showing the stock data
+
+A toolbar is added where hovering the grapth will display exact data etc
+
+Next step is to add so you can choose between stocks
