@@ -95,29 +95,7 @@
                         intersect: false
                     },
                     stacked: false,
-                    plugins: {
-                        tooltip: {
-                            callbacks: {
-                                afterBody: function (tooltipItems) {
-                                    const index = tooltipItems[0].dataIndex;
-
-                                    const open = openPrices[index];
-                                    const high = highPrices[index];
-                                    const low = lowPrices[index];
-                                    const close = closePrices[index];
-                                    const volume = volumes[index];
-
-                                    return [
-                                        `Open: $${open.toFixed(2)}`,
-                                        `High: $${high.toFixed(2)}`,
-                                        `Low: $${low.toFixed(2)}`,
-                                        `Close: $${close.toFixed(2)}`,
-                                        `Volume: ${volume.toLocaleString()}`
-                                    ];
-                                }
-                            }
-                        }
-                    },
+                   
                     scales: {
                         x: {
                             type: 'time',
