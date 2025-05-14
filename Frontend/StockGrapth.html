@@ -3,159 +3,273 @@
 <head>
     <meta charset="UTF-8">
     <title>Stock Price Chart</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial@3.3.0/dist/chartjs-chart-financial.min.js"></script>
+
+    <!-- Register the financial chart types -->
+    <script>
+        // Register everything needed for candlestick chart
+    const { FinancialController, CandlestickController, CandlestickElement } = Chart.Financial;
+
+    Chart.register(
+        Chart.FinancialController, 
+            Chart.CandlestickController, 
+            Chart.CandlestickElement,
+            Chart.TimeScale, 
+            Chart.LinearScale,
+            Chart.Tooltip,
+            Chart.Title
+    );
+    </script>
+
+
+
     <script src="https://cdn.jsdelivr.net/npm/date-fns"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
-
-     <!-- Länk till CSS-filen -->
     <link rel="stylesheet" href="{{ url_for('static', filename='stockSite.css') }}">
 </head>
 
 <body>
     <h2>Stock Price Chart</h2>
 
-    <!-- Buttons for the stocks-->
     <select id="stockSelector">
-    <option value="AAPL">AAPL</option>
-    <option value="TSLA">TSLA</option>
-    <option value="MSFT">MSFT</option>
-    <option value="NVDA">NVDA</option>
-    <option value="AMZN">AMZN</option>
-    <option value="GOOG">GOOG</option>
+        <option value="AAPL">AAPL</option>
+        <option value="TSLA">TSLA</option>
+        <option value="MSFT">MSFT</option>
+        <option value="NVDA">NVDA</option>
+        <option value="AMZN">AMZN</option>
+        <option value="GOOG">GOOG</option>
     </select>
+
+    <select id="chartTypeSelector">
+        <option value="line">Line</option>
+        <option value="candlestick">Candlestick</option>
+        <option value="bar">Bar</option> <!-- Added Bar option -->
+
+    </select>
+
 
     <canvas id="stockChart" width="800" height="400"></canvas>
 
     <script>
-        //Global variable
+        // Global chart variable
         let chart;
 
-        async function loadChart(symbol) {
+        // Fetch stock data from the server
+        async function fetchStockData(symbol) {
             const response = await fetch(`/stock/${symbol}/prices`);
             if (!response.ok) {
-                console.error(`Fel vid hämtning av data: ${response.status} ${response.statusText}`);
-                return;
+                console.error(`Error fetching data: ${response.status} ${response.statusText}`);
+                return null;
             }
             const data = await response.json();
-            console.log(data);
-
             if (!data || data.length === 0) {
-                console.error('Ingen data returnerad');
-                return;
+                console.error('No data returned');
+                return null;
+            }
+            return data;
+        }
+
+        function createCandlestickData(data) {
+            return data.map(item => ({
+                x: new Date(item[0]),
+                o: item[1],
+                h: item[2],
+                l: item[3],
+                c: item[4]
+            }));
+        }
+
+
+        // Process and map data for chart
+        function processStockData(data) {
+            const dates = data.map(item => new Date(item[0]));  // Date at index 0
+            const openPrices = data.map(item => item[1]);
+            const highPrices = data.map(item => item[2]);
+            const lowPrices = data.map(item => item[3]);
+            const closePrices = data.map(item => item[4]);
+            const volumes = data.map(item => item[5]);
+
+            return { dates, openPrices, highPrices, lowPrices, closePrices, volumes };
+        }
+
+        // Setup chart configuration
+        function setupChartConfig(symbol, processedData, chartType = 'line', rawData = null) {
+        const { dates, openPrices, highPrices, lowPrices, closePrices, volumes } = processedData;
+
+            if (chartType === 'candlestick') {
+                const candlestickData = createCandlestickData(rawData);
+
+                return {
+                    type: 'candlestick',
+                    data: {
+                        datasets: [{
+                            label: `Candlestick for ${symbol}`,
+                            data: candlestickData,
+                            color: {
+                                up: '#26a69a',
+                                down: '#ef5350',
+                                unchanged: '#ccc'
+                            }
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            x: { type: 'time' },
+                            y: { title: { display: true, text: 'Price ($)' } }
+                        }
+                    }
+                };
             }
 
-            const dates = data.map(item => new Date(item[0]));  // Datum finns på index 0
-            const openPrices = data.map(item => item[1]);       // Open finns på index 1
-            const highPrices = data.map(item => item[2]);       // High finns på index 2
-            const lowPrices = data.map(item => item[3]);        // Low finns på index 3
-            const closePrices = data.map(item => item[4]);      // Close finns på index 4
-            const volumes = data.map(item => item[5]);           // Volume finns på index 5
-
-
-            //Destroy the chart if it already exist, useful when swapping charts
-            if (chart) {
-            chart.destroy();
+            // Bar chart configuration
+            if (chartType === 'bar') {
+                return {
+                    type: 'bar',
+                    data: {
+                        labels: dates,
+                        datasets: [
+                            {
+                                label: `Close Price for ${symbol}`,
+                                data: closePrices,
+                                backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                                yAxisID: 'y'
+                            },
+                            {
+                                label: 'Volume',
+                                data: volumes,
+                                backgroundColor: 'rgba(100, 100, 100, 0.4)',
+                                yAxisID: 'y1'
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            title: { display: true, text: `Close Prices and Volume for ${symbol}` }
+                        },
+                        interaction: {
+                            mode: 'index',
+                            intersect: false
+                        },
+                        scales: {
+                            x: {
+                                type: 'time',
+                                time: { unit: 'day' },
+                                title: { display: true, text: 'Date' }
+                            },
+                            y: {
+                                type: 'linear',
+                                title: { display: true, text: 'Price ($)' },
+                                position: 'left'
+                            },
+                            y1: {
+                                type: 'linear',
+                                title: { display: true, text: 'Volume' },
+                                position: 'right',
+                                grid: { drawOnChartArea: false }
+                            }
+                        }
+                    }
+                };
             }
-            const ctx = document.getElementById('stockChart').getContext('2d');
-            chart = new Chart(ctx, {
+
+
+
+            // Original config (line + volume)
+            return {
                 type: 'bar',
                 data: {
                     labels: dates,
                     datasets: [
-                        {
-                            label: `Close Price for ${symbol}`,
-                            data: closePrices,
-                            borderColor: 'blue',
-                            backgroundColor: 'transparent',
-                            type: 'line',
-                            yAxisID: 'y',
-                            tension: 0.3
-                        },
-                        {
-                            label: `Open Price for ${symbol}`,
-                            data: openPrices,
-                            borderColor: 'green',
-                            backgroundColor: 'transparent',
-                            type: 'line',
-                            yAxisID: 'y',
-                            tension: 0.3
-                        },
-                        {
-                            label: `High Price for ${symbol}`,
-                            data: highPrices,
-                            borderColor: 'red',
-                            backgroundColor: 'transparent',
-                            type: 'line',
-                            yAxisID: 'y',
-                            tension: 0.3
-                        },
-                        {
-                            label: `Low Price for ${symbol}`,
-                            data: lowPrices,
-                            borderColor: 'orange',
-                            backgroundColor: 'transparent',
-                            type: 'line',
-                            yAxisID: 'y',
-                            tension: 0.3
-                        },
-                        {
-                            label: 'Volume',
-                            data: volumes,
-                            backgroundColor: 'rgba(100, 100, 100, 0.4)',
-                            borderColor: 'gray',
-                            yAxisID: 'y1',
-                            type: 'bar'
-                        }
+                        createDataset(`Close Price for ${symbol}`, closePrices, 'blue'),
+                        createDataset(`Open Price for ${symbol}`, openPrices, 'green'),
+                        createDataset(`High Price for ${symbol}`, highPrices, 'red'),
+                        createDataset(`Low Price for ${symbol}`, lowPrices, 'orange'),
+                        createVolumeDataset('Volume', volumes)
                     ]
                 },
                 options: {
                     responsive: true,
-                    interaction: {
-                        mode: 'index',
-                        intersect: false
-                    },
+                    interaction: { mode: 'index', intersect: false },
                     stacked: false,
-                   
                     scales: {
                         x: {
                             type: 'time',
-                            time: {
-                                unit: 'day',
-                                tooltipFormat: 'PPP'
-                            },
-                            title: {
-                                display: true,
-                                text: 'Date'
-                            }
+                            time: { unit: 'day', tooltipFormat: 'PPP' },
+                            title: { display: true, text: 'Date' }
                         },
                         y: {
                             type: 'linear',
                             position: 'left',
-                            title: {
-                                display: true,
-                                text: 'Price ($)'
-                            }
+                            title: { display: true, text: 'Price ($)' }
                         },
                         y1: {
                             type: 'linear',
                             position: 'right',
-                            title: {
-                                display: true,
-                                text: 'Volume'
-                            },
-                            grid: {
-                                drawOnChartArea: false
-                            }
+                            title: { display: true, text: 'Volume' },
+                            grid: { drawOnChartArea: false }
                         }
                     }
                 }
-            });
+            };
         }
 
+
+        // Helper function to create chart dataset
+        function createDataset(label, data, color) {
+            return {
+                label,
+                data,
+                borderColor: color,
+                backgroundColor: 'transparent',
+                type: 'line',
+                yAxisID: 'y',
+                tension: 0.3
+            };
+        }
+
+        // Helper function to create volume dataset
+        function createVolumeDataset(label, data) {
+            return {
+                label,
+                data,
+                backgroundColor: 'rgba(100, 100, 100, 0.4)',
+                borderColor: 'gray',
+                yAxisID: 'y1',
+                type: 'bar'
+            };
+        }
+
+        // Load chart data and render chart
+        async function loadChart(symbol, chartType = 'line') {
+            const data = await fetchStockData(symbol);
+            if (!data) return;
+
+            const { dates, openPrices, highPrices, lowPrices, closePrices, volumes } = processStockData(data);
+            const config = setupChartConfig(symbol, { dates, openPrices, highPrices, lowPrices, closePrices, volumes }, chartType, data);
+
+            // Destroy previous chart if exists
+            if (chart) {
+                chart.destroy();
+            }
+
+            const ctx = document.getElementById('stockChart').getContext('2d');
+            chart = new Chart(ctx, config);
+        }
+
+        // Handle stock selector change
         document.getElementById('stockSelector').addEventListener('change', function () {
-        loadChart(this.value);
+            loadChart(this.value);
         });
 
+        //Handle grapth change
+        document.getElementById('chartTypeSelector').addEventListener('change', function () {
+            loadChart(document.getElementById('stockSelector').value, this.value);
+        });
+
+        // Initial load
         loadChart('AAPL');
     </script>
 </body>
