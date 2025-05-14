@@ -62,3 +62,5 @@ Added the feature where the grapth is now showing the stock data
 A toolbar is added where hovering the grapth will display exact data etc
 
 Next step is to add so you can choose between stocks
+
+While coding, organizing the code is better, both to create stability and make it easier to extend/develop the application
