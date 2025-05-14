@@ -27,16 +27,34 @@
                 return;
             }
 
-            const dates = data.map(item => new Date(item.date));
+            /*const dates = data.map(item => new Date(item.date));
             const openPrices = data.map(item => item.open);
             const highPrices = data.map(item => item.high);
             const lowPrices = data.map(item => item.low);
             const closePrices = data.map(item => item.close);
-            const volumes = data.map(item => item.volume);
+            const volumes = data.map(item => item.volume); */
+
+            const dates = data.map(item => new Date(item[0]));  // Datum finns på index 0
+            const openPrices = data.map(item => item[1]);       // Open finns på index 1
+            const highPrices = data.map(item => item[2]);       // High finns på index 2
+            const lowPrices = data.map(item => item[3]);        // Low finns på index 3
+            const closePrices = data.map(item => item[4]);      // Close finns på index 4
+            const volumes = data.map(item => item[5]);           // Volume finns på index 5
+
+            console.log("Dates:", dates);
+            console.log("Open Prices:", openPrices);
+            console.log("High Prices:", highPrices);
+            console.log("Low Prices:", lowPrices);
+            console.log("Close Prices:", closePrices);
+            console.log("Volumes:", volumes);
+
 
             console.log("Exempelrad:", data[0]);
             console.log("Datum:", new Date(data[0][0]));
             console.log("Stängningspris:", data[0][3]);
+            //Dummy kod, vi fetchar ingen data!
+            console.log("Hämta dummy data", highPrices);
+
 
 
             const ctx = document.getElementById('stockChart').getContext('2d');
@@ -107,7 +125,7 @@
                             },
                             title: {
                                 display: true,
-                                text: 'Date'
+                                text: 'MM, dd, yyyy'
                             }
                         },
                         y: {
