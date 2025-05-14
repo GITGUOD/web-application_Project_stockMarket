@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Stock Price Chart</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/date-fns"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+</head>
+
+<body>
+    <h2>Stock Price Chart</h2>
+    <canvas id="stockChart" width="800" height="400"></canvas>
+
+    <script>
+        async function loadChart(symbol) {
+            const response = await fetch(`/stock/${symbol}/prices`);
+            if (!response.ok) {
+                console.error(`Fel vid hämtning av data: ${response.status} ${response.statusText}`);
+                return;
+            }
+            const data = await response.json();
+            console.log(data);
+
+            if (!data || data.length === 0) {
+                console.error('Ingen data returnerad');
+                return;
+            }
+
+            const dates = data.map(item => new Date(item.date));
+            const openPrices = data.map(item => item.open);
+            const highPrices = data.map(item => item.high);
+            const lowPrices = data.map(item => item.low);
+            const closePrices = data.map(item => item.close);
+            const volumes = data.map(item => item.volume);
+
+            console.log("Exempelrad:", data[0]);
+            console.log("Datum:", new Date(data[0][0]));
+            console.log("Stängningspris:", data[0][3]);
+
+
+            const ctx = document.getElementById('stockChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: dates,
+                    datasets: [
+                        {
+                            label: `Close Price for ${symbol}`,
+                            data: closePrices,
+                            borderColor: 'blue',
+                            backgroundColor: 'transparent',
+                            type: 'line',
+                            yAxisID: 'y',
+                            tension: 0.3
+                        },
+                        {
+                            label: `Open Price for ${symbol}`,
+                            data: openPrices,
+                            borderColor: 'green',
+                            backgroundColor: 'transparent',
+                            type: 'line',
+                            yAxisID: 'y',
+                            tension: 0.3
+                        },
+                        {
+                            label: `High Price for ${symbol}`,
+                            data: highPrices,
+                            borderColor: 'red',
+                            backgroundColor: 'transparent',
+                            type: 'line',
+                            yAxisID: 'y',
+                            tension: 0.3
+                        },
+                        {
+                            label: `Low Price for ${symbol}`,
+                            data: lowPrices,
+                            borderColor: 'orange',
+                            backgroundColor: 'transparent',
+                            type: 'line',
+                            yAxisID: 'y',
+                            tension: 0.3
+                        },
+                        {
+                            label: 'Volume',
+                            data: volumes,
+                            backgroundColor: 'rgba(100, 100, 100, 0.4)',
+                            borderColor: 'gray',
+                            yAxisID: 'y1',
+                            type: 'bar'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    stacked: false,
+                    scales: {
+                        x: {
+                            type: 'time',
+                            time: {
+                                unit: 'day',
+                                tooltipFormat: 'll'
+                            },
+                            title: {
+                                display: true,
+                                text: 'Date'
+                            }
+                        },
+                        y: {
+                            type: 'linear',
+                            position: 'left',
+                            title: {
+                                display: true,
+                                text: 'Price ($)'
+                            }
+                        },
+                        y1: {
+                            type: 'linear',
+                            position: 'right',
+                            title: {
+                                display: true,
+                                text: 'Volume'
+                            },
+                            grid: {
+                                drawOnChartArea: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        loadChart('AAPL');
+    </script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+Vad är static i Flask?
+I Flask används en mapp som heter static/ automatiskt för filer som inte förändras, till exempel:
+
+CSS-filer
+
+JavaScript-filer
+
+Bilder (t.ex. .png, .jpg)
+
+Du behöver inte skapa någon route för dessa filer utan Flask gör det åt dig!

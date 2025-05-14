@@ -1,3 +1,26 @@
-This will be my first trading bot
+Hello and welcome to one of my personal projects: the stockwatch web application
+where I will attempt to build a responsive web app that updates live stockmarket
+prices and analyzes historical data and tries to predict the next movement of the
+stock!
 
-I will program a simple trading bot that uses fibonacci 50% retracement
+Keyfeatures and skills that I will learn:
+
+Real-time Stock data
+- WebSockets, APIs
+Historical Data Analysis
+- Python
+
+Prediction Engine
+- Unknown
+
+Backend
+- FastAPI
+
+Frontend Web App:
+- React + TypeScript
+
+Deployment
+- Docker
+
+This project will take place early May to late June 2025 as I am aiming to take my BSc examination
+in computer science 2025. For continious support and guide, google and ChatGPT will be my friend
