@@ -30,7 +30,7 @@ class MarketData:
     def get_samples():
         tickers = [("MSFT", "Microsoft Corporation"),
            ("AAPL", "Apple Inc."),
-           ("GOOGL", "Alphabet Inc."),
+           ("GOOG", "Alphabet Inc."),
            ("TSLA", "Tesla Inc."),
            ("NVDA", "Nvidia Corporation."),
            ("AMZN", "Amazon.com Inc.")

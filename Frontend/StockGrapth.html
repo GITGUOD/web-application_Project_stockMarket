@@ -6,20 +6,28 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/date-fns"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+
+     <!-- Länk till CSS-filen -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='stockSite.css') }}">
 </head>
 
 <body>
     <h2>Stock Price Chart</h2>
 
+    <!-- Buttons for the stocks-->
     <select id="stockSelector">
     <option value="AAPL">AAPL</option>
     <option value="TSLA">TSLA</option>
     <option value="MSFT">MSFT</option>
+    <option value="NVDA">NVDA</option>
+    <option value="AMZN">AMZN</option>
+    <option value="GOOG">GOOG</option>
     </select>
 
     <canvas id="stockChart" width="800" height="400"></canvas>
 
     <script>
+        //Global variable
         let chart;
 
         async function loadChart(symbol) {

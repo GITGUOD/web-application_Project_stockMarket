@@ -97,6 +97,7 @@ class Database:
         """, (symbol, timeframe))
         return self.cursor.fetchall()
     
+    #This is not used yet
     def get_stock_name(self, symbol):
         self.cursor.execute("SELECT name FROM stock WHERE ticketSymbol = %s", (symbol,))
         result = self.cursor.fetchone()
