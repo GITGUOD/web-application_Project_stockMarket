@@ -66,3 +66,13 @@ Next step is to add so you can choose between stocks
 While coding, organizing the code is better, both to create stability and make it easier to extend/develop the application
 
 I have decided to make this project a prototype and build a way more complex application with react later on
+
+Candlestick patterns were too complex for chart.js so I decided to swap to TradingView's lightweight charts:
+
+npm install --save lightweight-charts
+
+Changed my mind, will be adding custom candlesticks by following a youtube guide on chart.js youtube channel
+
+Added a new feature where the user can choose what data to be viewed and added more flexibility
+
+Next time, fix the bar chart bug and fixing candlesticks
