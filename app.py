@@ -6,7 +6,7 @@ def main():
     db = Database()
     market_data = MarketData(db)
     market_data.load_sample_tickers()
-    market_data.load_all_sample_data()
+    market_data.load_all_sample_data("5y") #Default data 5year data, you can change this later on
     db.close()
 
 #Hämtar html filen

@@ -48,6 +48,15 @@
 
     </select>
 
+    <select id="timeRangeSelector">
+        <option value="1m">1 Month</option>
+        <option value="3m">3 Months</option>
+        <option value="6m">6 Months</option>
+        <option value="1y">1 Year</option>
+        <option value="5y" selected>5 Years</option>
+    </select>
+
+
 
     <canvas id="stockChart" width="800" height="400"></canvas>
 
@@ -78,6 +87,32 @@
                 l: item[3],
                 c: item[4]
             }));
+        }
+
+        function loadChosenHistoricalData(data, range) {
+            const chosenTime = new Date();
+            let startDate;
+
+            switch(range) {
+                case "1m":
+                    startDate = new Date(chosenTime.setMonth(chosenTime.getMonth() - 1));
+                    break;
+                case "3m":
+                    startDate = new Date(chosenTime.setMonth(chosenTime.getMonth() - 3));
+                    break;
+                case "6m":
+                    startDate = new Date(chosenTime.setMonth(chosenTime.getMonth() - 6));
+                    break;
+                case "1y":
+                    startDate = new Date(chosenTime.setFullYear(chosenTime.getFullYear() - 1));
+                    break;
+                case "5y":
+                default:
+                    return data; // no filtering
+            }
+
+            return data.filter(item => new Date(item[0]) >= startDate);
+
         }
 
 
@@ -244,8 +279,14 @@
 
         // Load chart data and render chart
         async function loadChart(symbol, chartType = 'line') {
-            const data = await fetchStockData(symbol);
+
+            const range = document.getElementById('timeRangeSelector').value;
+
+            let data = await fetchStockData(symbol);
             if (!data) return;
+
+            data = loadChosenHistoricalData(data, range);
+
 
             const { dates, openPrices, highPrices, lowPrices, closePrices, volumes } = processStockData(data);
             const config = setupChartConfig(symbol, { dates, openPrices, highPrices, lowPrices, closePrices, volumes }, chartType, data);
@@ -268,6 +309,11 @@
         document.getElementById('chartTypeSelector').addEventListener('change', function () {
             loadChart(document.getElementById('stockSelector').value, this.value);
         });
+
+        document.getElementById('timeRangeSelector').addEventListener('change', function () {
+            loadChart(document.getElementById('stockSelector').value, document.getElementById('chartTypeSelector').value);
+        });
+
 
         // Initial load
         loadChart('AAPL');

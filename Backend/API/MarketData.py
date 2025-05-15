@@ -38,9 +38,9 @@ class MarketData:
         return tickers
         
     
-    def load_stock_data(self, symbol):
+    def load_stock_data(self, symbol, HistoricalPeriod):
         #Fetching historical price stock data from Yahoo Finance
-        HistoricalPeriod = "5y" #You can adjust this time period depending on your needs
+        #HistoricalPeriod = "5y" #You can adjust this time period depending on your needs
         try:
             ticker = yf.Ticker(symbol)
             data = ticker.history(period=HistoricalPeriod)
@@ -59,10 +59,10 @@ class MarketData:
         except Exception as e:
             print(f"Failed to load stock data for {symbol}: {e}")
 
-    def load_all_sample_data(self):
+    def load_all_sample_data(self, HistoricalPeriod):
         tickers = self.get_samples()  # Eller MarketData.get_samples() om det är en statisk metod
         for symbol, _ in tickers:
-            self.load_stock_data(symbol)
+            self.load_stock_data(symbol, HistoricalPeriod)
 
     def close(self):
         self.db.close()
