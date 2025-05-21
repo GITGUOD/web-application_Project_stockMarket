@@ -33,7 +33,8 @@ class MarketData:
            ("GOOG", "Alphabet Inc."),
            ("TSLA", "Tesla Inc."),
            ("NVDA", "Nvidia Corporation."),
-           ("AMZN", "Amazon.com Inc.")
+           ("AMZN", "Amazon.com Inc."),
+           ("VOLCAR-B.ST", "VOLVO, AB SER. B")
            ]
         return tickers
         

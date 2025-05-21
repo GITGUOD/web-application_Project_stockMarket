@@ -20,7 +20,7 @@ class Database:
         # Create the table "stock" which will be used to add stocks if it doesn't exist
         self.cursor.execute("""
             CREATE TABLE IF NOT EXISTS stock (
-                ticketSymbol VARCHAR(10) PRIMARY KEY,
+                ticketSymbol VARCHAR(30) PRIMARY KEY,
                 name VARCHAR(100)
             );
         """)
@@ -28,7 +28,7 @@ class Database:
         # Create table for ticket
         self.cursor.execute("""
             CREATE TABLE IF NOT EXISTS ticket (
-                ticketSymbol VARCHAR(10),
+                ticketSymbol VARCHAR(30),
                 timeframe VARCHAR(20),
                 PRIMARY KEY (ticketSymbol, timeframe),
                 FOREIGN KEY (ticketSymbol) REFERENCES stock(ticketSymbol)
@@ -39,7 +39,7 @@ class Database:
         # Create table for stock prices with timeframes, opening prices etc
         self.cursor.execute("""
             CREATE TABLE IF NOT EXISTS price (
-                ticketSymbol VARCHAR(10),
+                ticketSymbol VARCHAR(30),
                 timeframe VARCHAR(20),
                 date DATE,
                 open FLOAT,

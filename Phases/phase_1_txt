@@ -76,3 +76,7 @@ Changed my mind, will be adding custom candlesticks by following a youtube guide
 Added a new feature where the user can choose what data to be viewed and added more flexibility
 
 Next time, fix the bar chart bug and fixing candlesticks
+
+I tried to insert Volvo but the tycket symbol was too long so I changed it.
+
+After countering issues that the data could not be inserted due to it being too large or long, I had to alter the tables in MySQL
