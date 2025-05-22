@@ -1,0 +1,1 @@
+Building a stockmarket webapplication where you can see historic stockprices of stocks such as Google. The project is in development but the vision for this project is that it will be able to predict patterns and help your investment entries better.
