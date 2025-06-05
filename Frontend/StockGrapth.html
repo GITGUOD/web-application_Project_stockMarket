@@ -137,6 +137,7 @@
         function setupChartConfig(symbol, processedData, chartType = 'line', rawData = null) {
         const { dates, openPrices, highPrices, lowPrices, closePrices, volumes } = processedData;
 
+            //Candlestick chart setup
             if (chartType === 'candlestick') {
                 const candlestickData = createCandlestickData(rawData);
 
@@ -150,13 +151,16 @@
                                 up: '#26a69a',
                                 down: '#ef5350',
                                 unchanged: '#ccc'
-                            }
+                            },
+                            barThickness: Math.max(1, Math.floor(800 / candlestickData.length)),
                         }]
                     },
                     options: {
                         responsive: true,
                         scales: {
-                            x: { type: 'time' },
+                            x: { type: 'time',
+                                time: { unit: 'day' }
+                             },
                             y: { title: { display: true, text: 'Price' } }
                         }
                     }
