@@ -49,6 +49,7 @@
     <select id="chartTypeSelector">
         <option value="line">Line</option>
         <option value="candlestick">Candlestick</option>
+        <option value="ohlc">OHLC</option>
         <option value="bar">Bar</option> <!-- Added Bar option -->
 
     </select>
@@ -64,10 +65,13 @@
 
 
     <canvas id="stockChart" width="800" height="400"></canvas>
+    <canvas id="volumeChart" width="800" height="100"></canvas>
+
 
     <script>
         // Global chart variable
         let chart;
+        let volumeChart;
 
         // Fetch stock data from the server
         async function fetchStockData(symbol) {
@@ -133,6 +137,35 @@
             return { dates, openPrices, highPrices, lowPrices, closePrices, volumes };
         }
 
+        function createVolumeChart(dates, volumes) {
+            const ctx2 = document.getElementById('volumeChart').getContext('2d');
+
+            if (volumeChart) {
+                volumeChart.destroy();
+            }
+            volumeChart = new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                    labels: dates,
+                    datasets: [{
+                        label: 'Volume',
+                        data: volumes,
+                        backgroundColor: 'rgba(100, 100, 100, 0.4)',
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: { type: 'time', time: { unit: 'day' }, display: true },
+                        y: { title: { display: true, text: 'Volume' }, display: true }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
         // Setup chart configuration
         function setupChartConfig(symbol, processedData, chartType = 'line', rawData = null) {
         const { dates, openPrices, highPrices, lowPrices, closePrices, volumes } = processedData;
@@ -159,7 +192,8 @@
                         responsive: true,
                         scales: {
                             x: { type: 'time',
-                                time: { unit: 'day' }
+                                time: { unit: 'day' },
+                                title: { display: true, text: 'Date' }
                              },
                             y: { title: { display: true, text: 'Price' } }
                         }
@@ -218,6 +252,41 @@
                     }
                 };
             }
+
+                        // OHLC chart configuration
+            if (chartType === 'ohlc') {
+                const ohlcData = createCandlestickData(rawData); // same format works for OHLC
+
+                return {
+                    type: 'ohlc',
+                    data: {
+                        datasets: [{
+                            label: `OHLC for ${symbol}`,
+                            data: ohlcData,
+                            color: {
+                                up: '#26a69a',
+                                down: '#ef5350',
+                                unchanged: '#ccc'
+                            },
+                            barThickness: Math.max(1, Math.floor(800 / ohlcData.length)),
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            x: {
+                                type: 'time',
+                                time: { unit: 'day' },
+                                title: { display: true, text: 'Date' }
+                            },
+                            y: {
+                                title: { display: true, text: 'Price' }
+                            }
+                        }
+                    }
+                };
+            }
+
 
 
 
@@ -305,8 +374,11 @@
                 chart.destroy();
             }
 
+
             const ctx = document.getElementById('stockChart').getContext('2d');
             chart = new Chart(ctx, config);
+            createVolumeChart(dates, volumes);
+
         }
 
         // Handle stock selector change
