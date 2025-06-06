@@ -25,16 +25,23 @@ class Database:
             );
         """)
 
-        # Create table for ticket
+         # Create table for timeframes
         self.cursor.execute("""
-            CREATE TABLE IF NOT EXISTS ticket (
-                ticketSymbol VARCHAR(30),
-                timeframe VARCHAR(20),
-                PRIMARY KEY (ticketSymbol, timeframe),
-                FOREIGN KEY (ticketSymbol) REFERENCES stock(ticketSymbol)
+            CREATE TABLE IF NOT EXISTS timeframe (
+                timeframe VARCHAR(20) PRIMARY KEY
             );
 
         """)
+
+        # Create table for ticket
+        #self.cursor.execute("""
+        #    CREATE TABLE IF NOT EXISTS ticket (
+        #        ticketSymbol VARCHAR(30),
+        #        PRIMARY KEY (ticketSymbol),
+        #        FOREIGN KEY (ticketSymbol) REFERENCES stock(ticketSymbol)
+        #    );
+        #
+       # """)
 
         # Create table for stock prices with timeframes, opening prices etc
         self.cursor.execute("""
@@ -48,10 +55,26 @@ class Database:
                 close FLOAT,
                 volume BIGINT,
                 PRIMARY KEY (ticketSymbol, timeframe, date),
-                FOREIGN KEY (ticketSymbol, timeframe) REFERENCES ticket(ticketSymbol, timeframe)
+                FOREIGN KEY (ticketSymbol) REFERENCES stock(ticketSymbol),
+                FOREIGN KEY (timeframe) REFERENCES timeframe(timeframe)
+
             );
 
         """)
+
+
+        # Insert allowed timeframes if not already there
+        allowed_timeframes = [
+            '1m', '2m', '5m', '15m', '30m', '60m', '90m',
+            '1h', '1d', '5d', '1wk', '1mo', '3mo'
+        ]
+
+        for tf in allowed_timeframes:
+            self.cursor.execute("""
+                INSERT IGNORE INTO timeframe (timeframe) VALUES (%s)
+            """, (tf,))
+        self.conn.commit()
+
 
     #Inserting stocks
     def insert_ticker(self, symbol, name):
@@ -60,10 +83,10 @@ class Database:
             "INSERT IGNORE INTO stock (ticketSymbol, name) VALUES (%s, %s)",
             (symbol, name)
         )
-        self.cursor.execute(
-            "INSERT IGNORE INTO ticket (ticketSymbol, timeframe) VALUES (%s, %s)",
-            (symbol, "1d")
-        )
+        #self.cursor.execute(
+        #    "INSERT IGNORE INTO ticket (ticketSymbol) VALUES (%s)",
+        #    (symbol,)
+        #)
         self.conn.commit()
 
         
@@ -88,7 +111,7 @@ class Database:
             print(f"Failed to insert price data for {ticketSymbol} on {date}: {e}")
 
 #Getting prices for the specific stock
-    def get_prices_for_ticker(self, symbol, timeframe="1d"):
+    def get_prices_for_ticker(self, symbol, timeframe):
         self.cursor.execute("""
             SELECT date, open, high, low, close, volume 
             FROM price 
@@ -102,6 +125,7 @@ class Database:
         self.cursor.execute("SELECT name FROM stock WHERE ticketSymbol = %s", (symbol,))
         result = self.cursor.fetchone()
         return result[0] if result else "Unknown"
+
 
 
     #Closing the connection

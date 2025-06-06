@@ -1,12 +1,21 @@
-from flask import Flask, jsonify, render_template
+from flask import Flask, jsonify, render_template, request
 from Backend.Database import Database
 from Backend.API.MarketData import MarketData
 
 def main():
     db = Database()
     market_data = MarketData(db)
+    timeframes = [
+    ("10y", "1mo"),
+    ("5y", "1wk"),
+    ("1y", "1d"),     # daily over 1 year
+    ("3mo", "4h"),
+    ("1mo", "1h"),
+    ("1wk", "30m"),    # 30min over 1 week etc
+    ("5d", "15m")     # 15-minute data over 5 days
+    ]
     market_data.load_sample_tickers()
-    market_data.load_all_sample_data("5y") #Default data 5year data, you can change this later on
+    market_data.load_all_sample_data(timeframes) #Our timeframe data
     db.close()
 
 #Hämtar html filen
@@ -21,9 +30,11 @@ def home():
 @app.route("/stock/<symbol>/prices")
 def get_stock_prices(symbol):
     try:
-        data = db.get_prices_for_ticker(symbol)
+        timeframe = request.args.get('timeframe', '1d')
+        data = db.get_prices_for_ticker(symbol, timeframe)
 
         if not data:
+
             return jsonify({"error": "No data found for symbol"}), 404
 
 
