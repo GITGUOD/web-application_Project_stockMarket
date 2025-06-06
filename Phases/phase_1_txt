@@ -80,3 +80,9 @@ Next time, fix the bar chart bug and fixing candlesticks
 I tried to insert Volvo but the tycket symbol was too long so I changed it.
 
 After countering issues that the data could not be inserted due to it being too large or long, I had to alter the tables in MySQL
+
+I fixed the candlestick issue, it was the plugins which made it diffucult for me to implement it. I didn't realize it until I opened the plugins and checked
+whether it was valid which it wasn't so I tried other versions. One thing else was that the download of chart.js was a failure so after opening the folder.
+I saw nothing which made sense why no graph displayed.
+
+After staying stuck on that specific part. I implemented ohlc graph and added an extra volume chart under. I also cleaned some unnessecary code etc.
