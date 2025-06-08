@@ -5,16 +5,21 @@ from Backend.API.MarketData import MarketData
 def main():
     db = Database()
     market_data = MarketData(db)
-    timeframes = [
+    VALID_INTERVALS = [
     ("10y", "1mo"),
+    ("10y", "1wk"),
+    ("5y", "1mo"),
     ("5y", "1wk"),
-    ("1y", "1d"),     # daily over 1 year
+    ("1y", "1d"), # daily over 1 year
+    ("3mo", "1d"),
+    ("1mo", "1d"), 
     ("1mo", "1h"),
-    ("1wk", "30m"),    # 30min over 1 week etc
+    ("5d", "30m"),    # 30min over 1 week etc
     ("5d", "15m")     # 15-minute data over 5 days
     ]
+
     market_data.load_sample_tickers()
-    market_data.load_all_sample_data(timeframes) #Our timeframe data
+    market_data.load_all_sample_data(VALID_INTERVALS) #Our timeframe data
     db.close()
 
 #Hämtar html filen
@@ -40,6 +45,7 @@ def get_stock_prices(symbol):
         return jsonify(data)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
 
 
 if __name__ == "__main__":

@@ -36,11 +36,14 @@
     </select>
 
     <select id="timeRangeSelector">
+        <option value="5d" >5 days</option>
+        <option value="1w" >1 week</option>
         <option value="1mo">1 Month</option>
         <option value="3mo">3 Months</option>
         <option value="6mo">6 Months</option>
         <option value="1y">1 Year</option>
         <option value="5y" selected>5 Years</option>
+        <option value="10y">10 Years</option>
     </select>
 
     <select id="timeframeSelector">
@@ -97,6 +100,12 @@
             let startDate;
 
             switch(range) {
+                case "5d":
+                    startDate = new Date(chosenTime.setDate(chosenTime.getDate() - 5));
+                    break;
+                case "1wk":
+                    startDate = new Date(chosenTime.setDate(chosenTime.getDate() - 1));
+                    break;
                 case "1mo":
                     startDate = new Date(chosenTime.setMonth(chosenTime.getMonth() - 1));
                     break;
@@ -109,6 +118,10 @@
                 case "1y":
                     startDate = new Date(chosenTime.setFullYear(chosenTime.getFullYear() - 1));
                     break;
+                case "10y":
+                     startDate = new Date(chosenTime.setFullYear(chosenTime.getFullYear() - 10));
+                     break;
+
                 case "5y":
                 default:
                     return data; // no filtering
