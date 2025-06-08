@@ -48,7 +48,7 @@ class Database:
             CREATE TABLE IF NOT EXISTS price (
                 ticketSymbol VARCHAR(30),
                 timeframe VARCHAR(20),
-                date DATE,
+                date DATETIME,
                 open FLOAT,
                 high FLOAT,
                 low FLOAT,

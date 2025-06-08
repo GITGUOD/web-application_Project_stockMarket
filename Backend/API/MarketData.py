@@ -49,6 +49,10 @@ class MarketData:
                 #print(f"[{symbol}] Fetching: {period} @ {interval}")
                 data = ticker.history(period=period, interval=interval)
 
+                if data.empty:
+                    print(f"[{symbol}] No data returned for {interval}")
+                    continue
+
                 for date, row in data.iterrows():
 
                     open_price = row['Open']
