@@ -6,11 +6,12 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.0"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial@0.2.1/dist/chartjs-chart-financial.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@1.2.1/dist/chartjs-plugin-zoom.min.js"></script> <!--Zoom feature coming soon -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
 
 
     <script src="https://cdn.jsdelivr.net/npm/date-fns"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='StockSite.css') }}">
+
 
 </head>
 
@@ -104,7 +105,7 @@
                     startDate = new Date(chosenTime.setDate(chosenTime.getDate() - 5));
                     break;
                 case "1wk":
-                    startDate = new Date(chosenTime.setDate(chosenTime.getDate() - 1));
+                    startDate = new Date(chosenTime.setDate(chosenTime.getDate() - 7));
                     break;
                 case "1mo":
                     startDate = new Date(chosenTime.setMonth(chosenTime.getMonth() - 1));
@@ -123,6 +124,8 @@
                      break;
 
                 case "5y":
+                    startDate = new Date(chosenTime.setFullYear(chosenTime.getFullYear() -5));
+                    break;
                 default:
                     return data; // no filtering
             }
@@ -176,6 +179,8 @@
         // Setup chart configuration
         function setupChartConfig(symbol, processedData, chartType = 'line', rawData = null) {
         const { dates, openPrices, highPrices, lowPrices, closePrices, volumes } = processedData;
+            const minDate = dates[0].getTime();
+            const maxDate = dates[dates.length - 1].getTime();
 
             //Candlestick chart setup
             if (chartType === 'candlestick') {
@@ -208,8 +213,30 @@
                                 title: { display: true, text: 'Date' }
                              },
                             y: { title: { display: true, text: 'Price' } }
+                        },
+                        plugins: {
+                            zoom: {
+                                limits: {
+                                    x: {min: minDate, max: maxDate}
+                                },
+                                pan: {
+                                    enabled: true,
+                                    mode: 'x',  // zooma/scrolla på x-axeln
+                                    modifierKey: 'ctrl' // pan bara med ctrl+drag (valfritt)
+                                },
+                                zoom: {
+                                    wheel: {
+                                        enabled: true,
+                                    },
+                                    pinch: {
+                                        enabled: true
+                                    },
+                                    mode: 'x', // zooma på x-axeln
+                                }
+                            }
                         }
                     }
+                    
                 };
             }
 
@@ -262,6 +289,7 @@
                             }
                         }
                     }
+                    
                 };
             }
 
@@ -294,8 +322,31 @@
                             y: {
                                 title: { display: true, text: 'Price' }
                             }
+                        },
+
+                        plugins: {
+                            zoom: {
+                                limits: {
+                                    x: {min: minDate, max: maxDate}
+                                },
+                                pan: {
+                                    enabled: true,
+                                    mode: 'x',  // zooma/scrolla på x-axeln
+                                    modifierKey: 'ctrl' // pan bara med ctrl+drag (valfritt)
+                                },
+                                zoom: {
+                                    wheel: {
+                                        enabled: true,
+                                    },
+                                    pinch: {
+                                        enabled: true
+                                    },
+                                    mode: 'x', // zooma på x-axeln
+                                }
+                            }
                         }
                     }
+                    
                 };
             }
 
