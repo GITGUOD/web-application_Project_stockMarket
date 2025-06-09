@@ -12,7 +12,7 @@ def main():
     ("5y", "1wk"),
     ("1y", "1d"), # daily over 1 year
     ("3mo", "1d"),
-    ("1mo", "1d"), 
+    ("3mo", "1h"), 
     ("1mo", "1h"),
     ("5d", "30m"),    # 30min over 1 week etc
     ("5d", "15m")     # 15-minute data over 5 days

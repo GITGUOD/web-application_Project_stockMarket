@@ -192,7 +192,11 @@
                                 down: '#ef5350',
                                 unchanged: '#ccc'
                             },
-                            barThickness: Math.max(1, Math.floor(800 / candlestickData.length)),
+                            //barThickness: Math.max(1, Math.floor(800 / candlestickData.length)),
+                            barThickness: Math.min(10, Math.max(2, Math.floor(800 / candlestickData.length))),
+
+
+
                             
                         }]
                     },
