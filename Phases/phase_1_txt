@@ -90,3 +90,5 @@ After staying stuck on that specific part. I implemented ohlc graph and added an
 Added timesframes, changed the database, variable DATE to DATETIME instead to be able to fetch the lowertimeframes. Also daily, weekly, monthly canldes work now. hourly candle does work too but is a little bit buggy. Unfortunately 15min, 30min does not work yet.
 
 Added the ability to zoom into the graph, fixed bugs where after pressing 10years for the historical data and then back to 5years. It would not display 5years anylonger. Another bugfix is the zoom, zooming out or in too much would destroy the graph. The zoom function is only featured in Candlesticks and OHLC graph.
+
+Added fibonacci retracement as a technical tool. However, there's much to do and I am planning to leave this project and remake it in react instead.
