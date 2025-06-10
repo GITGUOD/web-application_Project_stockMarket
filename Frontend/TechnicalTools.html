@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Trading Tools</title>
+  <style>
+    #chart {
+      width: 600px;
+      height: 400px;
+      border: 1px solid black;
+      position: relative;
+    }
+    .zone {
+      position: absolute;
+      background: rgba(0, 255, 0, 0.2);
+      border: 1px dashed green;
+    }
+  </style>
+</head>
+<body>
+  <h1>Trading Tools</h1>
+  <div id="chart"></div>
+
+  <script>
+    class FibonacciTool {
+      static calculate(startPrice, endPrice) {
+        const diff = endPrice - startPrice;
+        return {
+          0: endPrice,
+          0.236: endPrice - diff * 0.236,
+          0.382: endPrice - diff * 0.382,
+          0.5: endPrice - diff * 0.5,
+          0.618: endPrice - diff * 0.618,
+          0.786: endPrice - diff * 0.786,
+          1: startPrice
+        };
+      }
+    }
+
+    class MovingAverageTool {
+      static simpleMA(data, period) {
+        const ma = [];
+        for (let i = period - 1; i < data.length; i++) {
+          const slice = data.slice(i - period + 1, i + 1);
+          const avg = slice.reduce((a, b) => a + b, 0) / period;
+          ma.push(avg);
+        }
+        return ma;
+      }
+    }
+
+    class DrawingTool {
+      static drawRectangle(container, top, height) {
+        const rect = document.createElement('div');
+        rect.className = 'zone';
+        rect.style.top = `${top}px`;
+        rect.style.height = `${height}px`;
+        rect.style.left = `0px`;
+        rect.style.width = `100%`;
+        container.appendChild(rect);
+      }
+    }
+
+    class TradingApp {
+      constructor() {
+        this.chart = document.getElementById('chart');
+        this.init();
+      }
+
+      init() {
+        const start = 10;
+        const end = 2;
+        const levels = FibonacciTool.calculate(start, end);
+
+        console.log('Fibonacci levels:', levels);
+
+        // For demo: draw zones at 3 levels (convert price -> y-coord)
+        Object.entries(levels).forEach(([label, price]) => {
+          const y = this.priceToY(price);
+          DrawingTool.drawRectangle(this.chart, y, 2);
+        });
+      }
+
+      priceToY(price) {
+        const maxPrice = 10, minPrice = 0;
+        const height = this.chart.clientHeight;
+        return ((maxPrice - price) / (maxPrice - minPrice)) * height;
+      }
+    }
+
+    new TradingApp();
+  </script>
+</body>
+</html>
