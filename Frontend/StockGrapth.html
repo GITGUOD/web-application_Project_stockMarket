@@ -7,6 +7,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial@0.2.1/dist/chartjs-chart-financial.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.1.0/dist/chartjs-plugin-annotation.min.js"></script>
+
 
 
     <script src="https://cdn.jsdelivr.net/npm/date-fns"></script>
@@ -17,6 +19,13 @@
 
 <body>
     <h2>Stock Price Chart</h2>
+
+    <div class="toolbox">
+    <label>Start Price: <input type="number" id="startPrice" step="0.01" /></label>
+    <label>End Price: <input type="number" id="endPrice" step="0.01" /></label>
+    <button onclick="applyFibonacci()">Draw Fibonacci</button>
+    <button onclick="clearChart()">Clear</button>
+  </div>
 
     <select id="stockSelector">
         <option value="AAPL">AAPL</option>
@@ -53,13 +62,11 @@
         <option value="1d" selected>Daily</option>
         <!--Code down here does not work yet -->
         <option value="1h">1hourly</option>
-        <option value="30m">30minuts</option>
-        <option value="15m">15minuts</option>
+        <option value="30m">30minutes</option>
+        <option value="15m">15minutes</option>
 
     </select>
-
-
-
+    
 
     <canvas id="stockChart" width="800" height="400"></canvas>
     <canvas id="volumeChart" width="800" height="100"></canvas>
@@ -69,6 +76,54 @@
         // Global chart variable
         let chart;
         let volumeChart;
+
+        function clearChart() {
+            document.getElementById('startPrice').value = '';
+            document.getElementById('endPrice').value = '';
+            chart.destroy();
+
+            chart.update();
+
+
+        }
+
+        async function applyFibonacci() {
+            const start = parseFloat(document.getElementById('startPrice').value);
+            const end = parseFloat(document.getElementById('endPrice').value);
+
+            if (isNaN(start) || isNaN(end)) {
+                alert("Please enter valid prices.");
+                return;
+            }
+
+            const response = await fetch(`/api/fibonacci?start=${start}&end=${end}`);
+            const levels = await response.json();
+
+            if (!chart) return;
+
+            // Clear existing annotations
+            chart.options.plugins.annotation.annotations = {};
+
+            // Add a horizontal line for each Fibonacci level
+            Object.entries(levels).forEach(([label, price], index) => {
+                chart.options.plugins.annotation.annotations[`fibLine${index}`] = {
+                    type: 'line',
+                    yMin: price,
+                    yMax: price,
+                    borderColor: 'rgba(255, 99, 132, 0.8)',
+                    borderWidth: 2,
+                    label: {
+                        content: `${label} (${price.toFixed(2)})`,
+                        enabled: true,
+                        position: 'start',
+                        backgroundColor: 'rgba(255, 99, 132, 0.7)',
+                    }
+                };
+            });
+
+            chart.update();
+        }
+
 
         // Fetch stock data from the server
         async function fetchStockData(symbol, timeframe) {

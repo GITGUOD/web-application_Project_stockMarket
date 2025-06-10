@@ -46,6 +46,25 @@ def get_stock_prices(symbol):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
+@app.route('/api/fibonacci')
+def fibonacci():
+    try:
+        start = float(request.args.get('start'))
+        end = float(request.args.get('end'))
+        diff = end - start
+        levels = {
+            '0': end,
+            '0.236': end - diff * 0.236,
+            '0.382': end - diff * 0.382,
+            '0.5': end - diff * 0.5,
+            '0.618': end - diff * 0.618,
+            '0.786': end - diff * 0.786,
+            '1': start
+        }
+        return jsonify(levels)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
+    
 
 
 if __name__ == "__main__":
