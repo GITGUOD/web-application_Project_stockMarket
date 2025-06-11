@@ -20,12 +20,28 @@
 <body>
     <h2>Stock Price Chart</h2>
 
-    <div class="toolbox">
-    <label>Start Price: <input type="number" id="startPrice" step="0.01" /></label>
-    <label>End Price: <input type="number" id="endPrice" step="0.01" /></label>
+    <select id="toolSelector">
+        <option value="">-- Select Tool --</option>
+        <option value="fibonacci">Fibonacci</option>
+        <option value="trendline">Trendline</option>
+        <!-- Add more tools later -->
+    </select>
+
+    <!-- Fibonacci Toolbox -->
+    <div id="fibonacciControls" class="toolbox" style="display: none;">
+    <label>
+        Start Price:
+        <input type="number" id="startPrice" step="0.01" />
+    </label>
+    <label>
+        End Price:
+        <input type="number" id="endPrice" step="0.01" />
+    </label>
     <button onclick="applyFibonacci()">Draw Fibonacci</button>
     <button onclick="clearChart()">Clear</button>
-  </div>
+    </div>
+
+    
 
     <select id="stockSelector">
         <option value="AAPL">AAPL</option>
@@ -518,6 +534,22 @@
         document.getElementById('timeframeSelector').addEventListener('change', function () {
             loadChart(document.getElementById('stockSelector').value, document.getElementById('chartTypeSelector').value);
         });
+
+        //Vår fibonacci tool selector
+        const toolSelector = document.getElementById('toolSelector');
+        const fibControls = document.getElementById('fibonacciControls');
+
+        toolSelector.addEventListener('change', () => {
+            const selectedTool = toolSelector.value;
+
+            if (selectedTool === 'fibonacci') {
+                fibControls.style.display = 'block';
+                } else {
+                fibControls.style.display = 'none';
+            }
+        });
+
+        //Här slutar den
 
 
 
