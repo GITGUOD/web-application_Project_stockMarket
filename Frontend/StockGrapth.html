@@ -57,21 +57,28 @@
     <div id="Trendlines" class="toolbox3" style="display: none;">
     <p2>Trendline 1:</p2>
     <label>
-        Mark first Price:
+        Mark first Price and date:
         <input type="number" id="Price1" step="0.01" />
+        <input type="datetime-local" id="X1">
+
     </label>
     <label>
-        Mark second Price:
+        Mark second Price and date:
         <input type="number" id="Price2" step="0.01" />
+        <input type="datetime-local" id="X2">
+
     <br></br>
     <p2>Trendline 2:</p2>
     <label>
-        Mark first Price:
+        Mark first Price and date:
         <input type="number" id="Price3" step="0.01" />
+        <input type="datetime-local" id="X3">
+
     </label>
     <label>
-        Mark second Price:
+        Mark second Price and date:
         <input type="number" id="Price4" step="0.01" />
+        <input type="datetime-local" id="X4">
     </label>
     <button onclick="applyTrendLine()">Draw Trendline Ray</button>
     <button onclick="clearChart()">Clear</button>
@@ -139,14 +146,19 @@
         }
 
     function applyTrendLine() {
+    //Our variables which is used to draw the trendlines
+    const x1 = new Date(document.getElementById('X1').value);
+    const x2 = new Date(document.getElementById('X2').value);
+    const x3 = new Date(document.getElementById('X3').value);
+    const x4 = new Date(document.getElementById('X4').value);
     const p1 = parseFloat(document.getElementById('Price1').value);
     const p2 = parseFloat(document.getElementById('Price2').value);
     const p3 = parseFloat(document.getElementById('Price3').value);
     const p4 = parseFloat(document.getElementById('Price4').value);
 
 
-    if (isNaN(p1) || isNaN(p2) || isNaN(p3) || isNaN(p4)) {
-        alert("Please enter all three valid prices.");
+    if (isNaN(p1) || isNaN(p2) || isNaN(x1.getTime() || isNaN(x2.getTime()) || isNaN(p3) || isNaN(p4) || isNaN(x3.getTime()) || isNaN(x4.getTime()))) {
+        alert("Please enter all valid inputs.");
         return;
     }
 
@@ -155,23 +167,20 @@
     // Clear existing annotations
     chart.options.plugins.annotation.annotations = {};
 
-    // Fake x-values to calculate slope
-    const x1 = 0;
-    const x2 = 1;
-    const x3 = 2;
-    const x4 = 3;
-
     // Trendline 1:
     const m1 = (p2 - p1) / (x2 - x1); //K-value kx+m =y
     // Trendline 2:
     const m2 = (p3 - p4) / (x4 - x3);
 
-    // Chart x range (real x-axis range)
-    const xStart = chart.scales['x'].min;
-    const xEnd = chart.scales['x'].max;
+    const xStart = x1.toISOString(); // eller bara x1 om dina data är Date-objekt
+    const xEnd = x2.toISOString();
+
+    const xStart2 = x3.toISOString();
+    const xEnd2 = x4.toISOString();
+
 
     // Map xStart and xEnd to our fake scale (assume linear scaling)
-    const scaleFactor = xEnd - xStart;
+    //const scaleFactor = xEnd - xStart;
 
     // Project line1: based on point (x1 = 0, p1)
     //const yStart1 = m1 * 0 + p1;
@@ -204,8 +213,8 @@
 
     chart.options.plugins.annotation.annotations['trendline2'] = {
         type: 'line',
-        xMin: xStart,
-        xMax: xEnd,
+        xMin: xStart2,
+        xMax: xEnd2,
         yMin: yStart2,
         yMax: yEnd2,
         borderColor: 'blue',
