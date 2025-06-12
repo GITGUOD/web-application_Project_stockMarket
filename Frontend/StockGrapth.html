@@ -23,7 +23,7 @@
     <select id="toolSelector">
         <option value="">-- Select Tool --</option>
         <option value="fibonacci">Fibonacci</option>
-        <option value="trendline">Trendline</option>
+        <option value="Trendline">Trendline</option>
         <option value="Horisontal Ray">Horisontal Ray</option>
 
         <!-- Add more tools later -->
@@ -50,6 +50,30 @@
         <input type="number" id="Price" step="0.01" />
     </label>
     <button onclick="applyHorizontalRay()">Draw Horisontal Ray</button>
+    <button onclick="clearChart()">Clear</button>
+    </div>
+
+    <!--Trendlines Toolbox -->
+    <div id="Trendlines" class="toolbox3" style="display: none;">
+    <p2>Trendline 1:</p2>
+    <label>
+        Mark first Price:
+        <input type="number" id="Price1" step="0.01" />
+    </label>
+    <label>
+        Mark second Price:
+        <input type="number" id="Price2" step="0.01" />
+    <br></br>
+    <p2>Trendline 2:</p2>
+    <label>
+        Mark first Price:
+        <input type="number" id="Price3" step="0.01" />
+    </label>
+    <label>
+        Mark second Price:
+        <input type="number" id="Price4" step="0.01" />
+    </label>
+    <button onclick="applyTrendLine()">Draw Trendline Ray</button>
     <button onclick="clearChart()">Clear</button>
     </div>
     
@@ -113,6 +137,91 @@
 
 
         }
+
+    function applyTrendLine() {
+    const p1 = parseFloat(document.getElementById('Price1').value);
+    const p2 = parseFloat(document.getElementById('Price2').value);
+    const p3 = parseFloat(document.getElementById('Price3').value);
+    const p4 = parseFloat(document.getElementById('Price4').value);
+
+
+    if (isNaN(p1) || isNaN(p2) || isNaN(p3) || isNaN(p4)) {
+        alert("Please enter all three valid prices.");
+        return;
+    }
+
+    if (!chart) return;
+
+    // Clear existing annotations
+    chart.options.plugins.annotation.annotations = {};
+
+    // Fake x-values to calculate slope
+    const x1 = 0;
+    const x2 = 1;
+    const x3 = 2;
+    const x4 = 3;
+
+    // Trendline 1:
+    const m1 = (p2 - p1) / (x2 - x1); //K-value kx+m =y
+    // Trendline 2:
+    const m2 = (p3 - p4) / (x4 - x3);
+
+    // Chart x range (real x-axis range)
+    const xStart = chart.scales['x'].min;
+    const xEnd = chart.scales['x'].max;
+
+    // Map xStart and xEnd to our fake scale (assume linear scaling)
+    const scaleFactor = xEnd - xStart;
+
+    // Project line1: based on point (x1 = 0, p1)
+    //const yStart1 = m1 * 0 + p1;
+    //const yEnd1 = m1 * scaleFactor + p1;
+    const yStart1 = p1;
+    const yEnd1 = p2;
+
+    // Project line2: based on point (x2 = 1, p2)
+    //const yStart2 = m2 * -1 + p2;  // Going back to x=0
+    //const yEnd2 = m2 * (scaleFactor - 1) + p2;
+    const yStart2 = p3;
+    const yEnd2 = p4;
+
+    // Apply trendline annotations
+    chart.options.plugins.annotation.annotations['trendline'] = {
+        type: 'line',
+        xMin: xStart,
+        xMax: xEnd,
+        yMin: yStart1,
+        yMax: yEnd1,
+        borderColor: 'green',
+        borderWidth: 2,
+        label: {
+            content: 'Trendline 1',
+            enabled: true,
+            position: 'start',
+            backgroundColor: 'green',
+        }
+    };
+
+    chart.options.plugins.annotation.annotations['trendline2'] = {
+        type: 'line',
+        xMin: xStart,
+        xMax: xEnd,
+        yMin: yStart2,
+        yMax: yEnd2,
+        borderColor: 'blue',
+        borderWidth: 2,
+        label: {
+            content: 'Trendline 2',
+            enabled: true,
+            position: 'start',
+            backgroundColor: 'blue',
+        }
+    };
+
+    chart.update();
+}
+
+
 
         async function applyHorizontalRay() {
             const p = parseFloat(document.getElementById('Price').value);
@@ -583,6 +692,8 @@
         const toolSelector = document.getElementById('toolSelector');
         const fibControls = document.getElementById('fibonacciControls');
         const horizontalRayControls = document.getElementById('Horisontal');
+        const trendlineControls = document.getElementById('Trendlines');
+
 
         toolSelector.addEventListener('change', () => {
             const selectedTool = toolSelector.value;
@@ -590,12 +701,15 @@
             // Hide all tool control panels
             fibControls.style.display = 'none';
             horizontalRayControls.style.display = 'none';
+            trendlineControls.style.display = 'none';
 
             // Show the selected one
             if (selectedTool === 'fibonacci') {
                 fibControls.style.display = 'block';
             } else if (selectedTool === 'Horisontal Ray') {
                 horizontalRayControls.style.display = 'block';
+            } else if(selectedTool === 'Trendline') {
+                trendlineControls.style.display = 'block';
             }
         });
 
