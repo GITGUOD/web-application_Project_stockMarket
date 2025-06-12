@@ -24,6 +24,8 @@
         <option value="">-- Select Tool --</option>
         <option value="fibonacci">Fibonacci</option>
         <option value="trendline">Trendline</option>
+        <option value="Horisontal Ray">Horisontal Ray</option>
+
         <!-- Add more tools later -->
     </select>
 
@@ -44,10 +46,10 @@
     <!--Horisontal Ray Toolbox -->
     <div id="Horisontal" class="toolbox2" style="display: none;">
     <label>
-        Price to Mark:
+        Mark Price:
         <input type="number" id="Price" step="0.01" />
     </label>
-    <button onclick="applyHorisontal()">Draw Horisontal Ray</button>
+    <button onclick="applyHorizontalRay()">Draw Horisontal Ray</button>
     <button onclick="clearChart()">Clear</button>
     </div>
     
@@ -111,6 +113,39 @@
 
 
         }
+
+        async function applyHorizontalRay() {
+            const p = parseFloat(document.getElementById('Price').value);
+
+            if (isNaN(p)) {
+                alert("Please enter a valid price.");
+                return;
+            }
+
+            if (!chart) return;
+
+            // Clear existing annotations
+            chart.options.plugins.annotation.annotations = {};
+
+            // Add one horizontal line at price p
+            chart.options.plugins.annotation.annotations['horizontalRay'] = {
+                type: 'line',
+                yMin: p,
+                yMax: p,
+                borderColor: 'orange',
+                borderWidth: 2,
+                label: {
+                    content: `Ray (${p.toFixed(2)})`,
+                    enabled: true,
+                    position: 'start',
+                    backgroundColor: 'orange',
+                }
+            };
+
+            chart.update();
+        }
+
+
 
         async function applyFibonacci() {
             const start = parseFloat(document.getElementById('startPrice').value);
@@ -547,16 +582,23 @@
         //Vår fibonacci tool selector
         const toolSelector = document.getElementById('toolSelector');
         const fibControls = document.getElementById('fibonacciControls');
+        const horizontalRayControls = document.getElementById('Horisontal');
 
         toolSelector.addEventListener('change', () => {
             const selectedTool = toolSelector.value;
 
+            // Hide all tool control panels
+            fibControls.style.display = 'none';
+            horizontalRayControls.style.display = 'none';
+
+            // Show the selected one
             if (selectedTool === 'fibonacci') {
                 fibControls.style.display = 'block';
-                } else {
-                fibControls.style.display = 'none';
+            } else if (selectedTool === 'Horisontal Ray') {
+                horizontalRayControls.style.display = 'block';
             }
         });
+
 
         //Här slutar den
 
