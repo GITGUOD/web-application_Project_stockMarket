@@ -22,6 +22,13 @@ h2 {
     margin-top: 20px;
 }
 
+p2 {
+    text-align: center;
+    color: #555;
+    font-size: 1.5em;
+    margin-top: 20px;
+}
+
 /* Tabellens stil */
 table {
     width: 80%;
