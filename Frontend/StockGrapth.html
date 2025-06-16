@@ -25,7 +25,7 @@
         <option value="fibonacci">Fibonacci</option>
         <option value="Trendline">Trendline</option>
         <option value="Horisontal Ray">Horisontal Ray</option>
-
+        <option value="Rectangle">Draw Rectangle</option>
         <!-- Add more tools later -->
     </select>
 
@@ -40,6 +40,20 @@
         <input type="number" id="endPrice" step="0.01" />
     </label>
     <button onclick="applyFibonacci()">Draw Fibonacci</button>
+    <button onclick="clearChart()">Clear</button>
+    </div>
+
+    <!-- Rectangle Toolbox -->
+    <div id="DrawingRectangles" class="toolbox3" style="display: none;">
+    <label>
+        Start Price:
+        <input type="number" id="startPriceForRec" step="0.01" />
+    </label>
+    <label>
+        End Price:
+        <input type="number" id="endPriceForRec" step="0.01" />
+    </label>
+    <button onclick="applyRectangle()">Draw Rectangle</button>
     <button onclick="clearChart()">Clear</button>
     </div>
 
@@ -139,96 +153,140 @@
             document.getElementById('startPrice').value = '';
             document.getElementById('endPrice').value = '';
             chart.destroy();
+            zoneIdCounter = 1; // reset counter for zones
 
             chart.update();
 
 
         }
 
-    function applyTrendLine() {
-    //Our variables which is used to draw the trendlines
-    const x1 = new Date(document.getElementById('X1').value);
-    const x2 = new Date(document.getElementById('X2').value);
-    const x3 = new Date(document.getElementById('X3').value);
-    const x4 = new Date(document.getElementById('X4').value);
-    const p1 = parseFloat(document.getElementById('Price1').value);
-    const p2 = parseFloat(document.getElementById('Price2').value);
-    const p3 = parseFloat(document.getElementById('Price3').value);
-    const p4 = parseFloat(document.getElementById('Price4').value);
+        let zoneIdCounter = 1;
+
+            function applyRectangle() {
+                const startPrice = parseFloat(document.getElementById('startPriceForRec').value);
+                const endPrice = parseFloat(document.getElementById('endPriceForRec').value);
+
+                if (isNaN(startPrice) || isNaN(endPrice)) {
+                    alert("Please enter valid prices.");
+                    return;
+                }
+
+                const yMin = Math.min(startPrice, endPrice);
+                const yMax = Math.max(startPrice, endPrice);
+
+                const xMin = chart.scales.x.min;
+                const xMax = chart.scales.x.max;
+
+                const zoneId = 'zone' + zoneIdCounter++;
+
+                // Add the rectangle (box annotation)
+                chart.options.plugins.annotation.annotations[zoneId] = {
+                    type: 'box',
+                    xMin: xMin,
+                    xMax: xMax,
+                    yMin: yMin,
+                    yMax: yMax,
+                    backgroundColor: 'rgba(255, 165, 0, 0.15)', // Light orange
+                    borderColor: 'rgba(255, 165, 0, 0.8)',
+                    borderWidth: 1,
+                    label: {
+                        display: true,
+                        content: `Zone ${zoneIdCounter - 1}`,
+                        position: 'center',
+                        backgroundColor: 'rgba(0,0,0,0.7)',
+                        color: 'white',
+                        font: { size: 10 },
+                    }
+                };
+
+                chart.update();
+            }
 
 
-    if (isNaN(p1) || isNaN(p2) || isNaN(x1.getTime() || isNaN(x2.getTime()) || isNaN(p3) || isNaN(p4) || isNaN(x3.getTime()) || isNaN(x4.getTime()))) {
-        alert("Please enter all valid inputs.");
-        return;
+        function applyTrendLine() {
+        //Our variables which is used to draw the trendlines
+        const x1 = new Date(document.getElementById('X1').value);
+        const x2 = new Date(document.getElementById('X2').value);
+        const x3 = new Date(document.getElementById('X3').value);
+        const x4 = new Date(document.getElementById('X4').value);
+        const p1 = parseFloat(document.getElementById('Price1').value);
+        const p2 = parseFloat(document.getElementById('Price2').value);
+        const p3 = parseFloat(document.getElementById('Price3').value);
+        const p4 = parseFloat(document.getElementById('Price4').value);
+
+
+        if (isNaN(p1) || isNaN(p2) || isNaN(x1.getTime() || isNaN(x2.getTime()) || isNaN(p3) || isNaN(p4) || isNaN(x3.getTime()) || isNaN(x4.getTime()))) {
+            alert("Please enter all valid inputs.");
+            return;
+        }
+
+        if (!chart) return;
+
+        // Clear existing annotations
+        chart.options.plugins.annotation.annotations = {};
+
+        // Trendline 1:
+        const m1 = (p2 - p1) / (x2 - x1); //K-value kx+m =y
+        // Trendline 2:
+        const m2 = (p3 - p4) / (x4 - x3);
+
+        const xStart = x1.toISOString(); // eller bara x1 om dina data är Date-objekt
+        const xEnd = x2.toISOString();
+
+        const xStart2 = x3.toISOString();
+        const xEnd2 = x4.toISOString();
+
+
+        // Map xStart and xEnd to our fake scale (assume linear scaling)
+        //const scaleFactor = xEnd - xStart;
+
+        // Project line1: based on point (x1 = 0, p1)
+        //const yStart1 = m1 * 0 + p1;
+        //const yEnd1 = m1 * scaleFactor + p1;
+        const yStart1 = p1;
+        const yEnd1 = p2;
+
+        // Project line2: based on point (x2 = 1, p2)
+        //const yStart2 = m2 * -1 + p2;  // Going back to x=0
+        //const yEnd2 = m2 * (scaleFactor - 1) + p2;
+        const yStart2 = p3;
+        const yEnd2 = p4;
+
+        // Apply trendline annotations
+        chart.options.plugins.annotation.annotations['trendline'] = {
+            type: 'line',
+            xMin: xStart,
+            xMax: xEnd,
+            yMin: yStart1,
+            yMax: yEnd1,
+            borderColor: 'green',
+            borderWidth: 2,
+            label: {
+                content: 'Trendline 1',
+                enabled: true,
+                position: 'start',
+                backgroundColor: 'green',
+            }
+        };
+
+        chart.options.plugins.annotation.annotations['trendline2'] = {
+            type: 'line',
+            xMin: xStart2,
+            xMax: xEnd2,
+            yMin: yStart2,
+            yMax: yEnd2,
+            borderColor: 'blue',
+            borderWidth: 2,
+            label: {
+                content: 'Trendline 2',
+                enabled: true,
+                position: 'start',
+                backgroundColor: 'blue',
+            }
+        };
+
+        chart.update();
     }
-
-    if (!chart) return;
-
-    // Clear existing annotations
-    chart.options.plugins.annotation.annotations = {};
-
-    // Trendline 1:
-    const m1 = (p2 - p1) / (x2 - x1); //K-value kx+m =y
-    // Trendline 2:
-    const m2 = (p3 - p4) / (x4 - x3);
-
-    const xStart = x1.toISOString(); // eller bara x1 om dina data är Date-objekt
-    const xEnd = x2.toISOString();
-
-    const xStart2 = x3.toISOString();
-    const xEnd2 = x4.toISOString();
-
-
-    // Map xStart and xEnd to our fake scale (assume linear scaling)
-    //const scaleFactor = xEnd - xStart;
-
-    // Project line1: based on point (x1 = 0, p1)
-    //const yStart1 = m1 * 0 + p1;
-    //const yEnd1 = m1 * scaleFactor + p1;
-    const yStart1 = p1;
-    const yEnd1 = p2;
-
-    // Project line2: based on point (x2 = 1, p2)
-    //const yStart2 = m2 * -1 + p2;  // Going back to x=0
-    //const yEnd2 = m2 * (scaleFactor - 1) + p2;
-    const yStart2 = p3;
-    const yEnd2 = p4;
-
-    // Apply trendline annotations
-    chart.options.plugins.annotation.annotations['trendline'] = {
-        type: 'line',
-        xMin: xStart,
-        xMax: xEnd,
-        yMin: yStart1,
-        yMax: yEnd1,
-        borderColor: 'green',
-        borderWidth: 2,
-        label: {
-            content: 'Trendline 1',
-            enabled: true,
-            position: 'start',
-            backgroundColor: 'green',
-        }
-    };
-
-    chart.options.plugins.annotation.annotations['trendline2'] = {
-        type: 'line',
-        xMin: xStart2,
-        xMax: xEnd2,
-        yMin: yStart2,
-        yMax: yEnd2,
-        borderColor: 'blue',
-        borderWidth: 2,
-        label: {
-            content: 'Trendline 2',
-            enabled: true,
-            position: 'start',
-            backgroundColor: 'blue',
-        }
-    };
-
-    chart.update();
-}
 
 
 
@@ -702,6 +760,7 @@
         const fibControls = document.getElementById('fibonacciControls');
         const horizontalRayControls = document.getElementById('Horisontal');
         const trendlineControls = document.getElementById('Trendlines');
+        const drawRectangle = document.getElementById('DrawingRectangles');
 
 
         toolSelector.addEventListener('change', () => {
@@ -719,6 +778,8 @@
                 horizontalRayControls.style.display = 'block';
             } else if(selectedTool === 'Trendline') {
                 trendlineControls.style.display = 'block';
+            } else if(selectedTool === 'Rectangle') {
+                drawRectangle.style.display = 'block';
             }
         });
 
