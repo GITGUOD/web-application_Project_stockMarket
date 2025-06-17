@@ -1,0 +1,12 @@
+Hello, welcome to phase 2:
+
+I will document my progress through phase 2:
+
+Added more tables in the database for users, this is designed so each respective user can have a personalized portfolio
+
+Authentication has been added, registration, log out etc
+
+HTML added for the respective login and register page
+
+Logout button added in the frontend.
+
