@@ -1,3 +1,4 @@
+from decimal import Decimal
 import mysql.connector
 
 class Database:
@@ -154,6 +155,9 @@ class Database:
         self.conn.commit()
 
     def buy_stock(self, user_id, symbol, quantity, price):
+        # Convert quantity and price to Decimal
+        quantity = Decimal(quantity)
+        price = Decimal(str(price))  # Convert float to str first to avoid precision issues
         total_cost = quantity * price
 
         # Get user cash
@@ -207,6 +211,10 @@ class Database:
 
     # Sell stock
     def sell_stock(self, user_id, symbol, quantity, price):
+        # Convert quantity and price to Decimal
+        quantity = Decimal(quantity)
+        price = Decimal(str(price))  # Convert float to str first to avoid precision issues
+        
         total_value = quantity * price
 
         # Check if user has this stock

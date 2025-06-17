@@ -103,6 +103,82 @@ def fibonacci():
     except Exception as e:
         return jsonify({'error': str(e)}), 400
     
+@app.route('/buy', methods=['POST'])
+def buy():
+    data = request.get_json()
+    user_id = data.get('user_id')
+    symbol = data.get('symbol')
+    quantity = data.get('quantity')
+
+    # Validate inputs
+    if not (user_id and symbol and quantity):
+        return jsonify({"error": "Missing required fields"}), 400
+    
+    # Get latest price for the stock symbol
+    db.cursor.execute("""
+        SELECT close 
+        FROM price
+        WHERE ticketSymbol = %s
+        ORDER BY date DESC
+        LIMIT 1
+    """, (symbol,))
+    price_row = db.cursor.fetchone()
+
+    if not price_row:
+        return jsonify({"error": "Price data not found for symbol"}), 400
+    
+    price = float(price_row[0])
+
+    # Call buy_stock with price
+    result = db.buy_stock(user_id, symbol, quantity, price)
+
+    if "error" in result:
+        return jsonify(result), 400
+    else:
+        return jsonify(result), 200
+    
+
+@app.route('/sell', methods=['POST'])
+def sell():
+    data = request.get_json()
+    user_id = data.get('user_id')
+    symbol = data.get('symbol')
+    quantity = data.get('quantity')
+
+    # Validate inputs
+    if not (user_id and symbol and quantity):
+        return jsonify({"error": "Missing required fields"}), 400
+
+    # Get latest price for the stock symbol
+    db.cursor.execute("""
+        SELECT close 
+        FROM price
+        WHERE ticketSymbol = %s
+        ORDER BY date DESC
+        LIMIT 1
+    """, (symbol,))
+    price_row = db.cursor.fetchone()
+
+    if not price_row:
+        return jsonify({"error": "Price data not found for symbol"}), 400
+    
+    price = float(price_row[0])
+
+    # Call your sell_stock method (implement this similarly to buy_stock)
+    result = db.sell_stock(user_id, symbol, quantity, price)
+
+    if "error" in result:
+        return jsonify(result), 400
+    else:
+        return jsonify(result), 200
+    
+@app.route('/api/session')
+def get_session():
+    user_id = session.get('user_id')
+    return jsonify({'user_id': user_id})
+
+
+    
 
 
 if __name__ == "__main__":
