@@ -24,6 +24,15 @@
 <body>
     <h2>Stock Price Chart</h2>
 
+    <form id="tradeForm">
+    <input type="text" id="symbol" placeholder="Stock Symbol" required />
+    <input type="number" id="quantity" placeholder="Quantity" min="1" required />
+    <button type="button" id="buyBtn">Buy</button>
+    <button type="button" id="sellBtn">Sell</button>
+    </form>
+
+    <div id="result"></div>
+
     <select id="toolSelector">
         <option value="">-- Select Tool --</option>
         <option value="fibonacci">Fibonacci</option>
@@ -152,6 +161,15 @@
         // Global chart variable
         let chart;
         let volumeChart;
+        let user_id;
+
+        fetch('/api/session')
+        .then(res => res.json())
+        .then(data => {
+            user_id = data.user_id;
+            // Now you can use user_id in your other functions
+        });
+
 
         function clearChart() {
             document.getElementById('startPrice').value = '';
@@ -740,6 +758,41 @@
             createVolumeChart(dates, volumes);
 
         }
+
+        document.getElementById('buyBtn').addEventListener('click', () => {
+        trade('buy');
+        });
+
+        document.getElementById('sellBtn').addEventListener('click', () => {
+        trade('sell');
+        });
+        
+        function trade(action) {
+            const symbol = document.getElementById('symbol').value.toUpperCase();
+            const quantity = parseInt(document.getElementById('quantity').value, 10);
+
+            if (!symbol || !quantity || quantity <= 0) {
+                alert('Please enter valid symbol and quantity');
+                return;
+            }
+
+            fetch(`/${action}`, {
+                method: 'POST',
+                headers: {
+                'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ user_id, symbol, quantity })
+            })
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('result').textContent = JSON.stringify(data);
+            })
+            .catch(err => {
+                console.error(err);
+                document.getElementById('result').textContent = 'Error: ' + err.message;
+            });
+        }
+
 
         // Handle stock selector change
         document.getElementById('stockSelector').addEventListener('change', function () {
