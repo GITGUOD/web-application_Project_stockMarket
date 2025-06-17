@@ -29,8 +29,8 @@ class Database:
         self.cursor.execute("""
             CREATE TABLE IF NOT EXISTS users (
                     id INTEGER PRIMARY KEY AUTO_INCREMENT,
-                    username TEXT UNIQUE,
-                    password TEXT,
+                    username VARCHAR(255) UNIQUE,
+                    password VARCHAR(255),
                     initial_cash DECIMAL(10, 2) DEFAULT 10000      
                 );
                                 
@@ -42,7 +42,7 @@ class Database:
             CREATE TABLE IF NOT EXISTS holding (
                 id INTEGER PRIMARY KEY AUTO_INCREMENT,
                 user_id INTEGER,
-                symbol TEXT,
+                symbol VARCHAR(255),
                 quantity INTEGER,
                 avg_price DECIMAL(10, 2),
                 FOREIGN KEY(user_id) REFERENCES users(id)
@@ -51,11 +51,11 @@ class Database:
                             """)
         #Creating table for users trades
         self.cursor.execute("""
-            CREATE TABLE trades (
+            CREATE TABLE IF NOT EXISTS trades (
                 id INTEGER PRIMARY KEY AUTO_INCREMENT,
                 user_id INTEGER,
-                action TEXT, -- 'BUY' eller 'SELL'
-                symbol TEXT,
+                action VARCHAR(255), -- 'BUY' eller 'SELL'
+                symbol VARCHAR(255),
                 quantity INTEGER,
                 price DECIMAL(10, 2),
                 timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,

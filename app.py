@@ -25,6 +25,7 @@ def main():
 
 #Hämtar html filen
 app = Flask(__name__, template_folder='frontend')
+app.secret_key = "3f1cbe6d08b349a996fd5dcbdb876a78"
 db = Database()
 
 @app.route('/register', methods=['GET', 'POST'])
