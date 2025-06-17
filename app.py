@@ -1,4 +1,5 @@
-from flask import Flask, jsonify, render_template, request
+from flask import Flask, jsonify, render_template, request, session, redirect, url_for
+from werkzeug.security import generate_password_hash, check_password_hash
 from Backend.Database import Database
 from Backend.API.MarketData import MarketData
 
@@ -26,10 +27,46 @@ def main():
 app = Flask(__name__, template_folder='frontend')
 db = Database()
 
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = generate_password_hash(request.form['password'])
+
+        success = db.create_user(username, password)
+        if not success:
+            return "User already exists", 400
+
+        return redirect('/login')
+    return render_template("register.html")
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+
+        user = db.get_user_by_username(username)
+        if user and check_password_hash(user['password'], password):
+            session['user_id'] = user['id']
+            return redirect(url_for('home'))
+        return "Invalid credentials", 401
+
+    return render_template("login.html")
+
+@app.route('/logout')
+def logout():
+    session.pop('user_id', None)
+    return redirect('/login')
+
+
+
+
 @app.route('/')
 def home():
-    return render_template("StockGrapth.html")  # Visa din HTML-sida här
-
+    if 'user_id' not in session:
+            return redirect('/login')
+    return render_template("StockGrapth.html")
 
 @app.route("/stock/<symbol>/prices")
 def get_stock_prices(symbol):

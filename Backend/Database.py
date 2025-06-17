@@ -28,8 +28,9 @@ class Database:
         # Creating table for users
         self.cursor.execute("""
             CREATE TABLE IF NOT EXISTS users (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    id INTEGER PRIMARY KEY AUTO_INCREMENT,
                     username TEXT UNIQUE,
+                    password TEXT,
                     initial_cash DECIMAL(10, 2) DEFAULT 10000      
                 );
                                 
@@ -39,7 +40,7 @@ class Database:
         # Creating table for users holding
         self.cursor.execute("""
             CREATE TABLE IF NOT EXISTS holding (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                id INTEGER PRIMARY KEY AUTO_INCREMENT,
                 user_id INTEGER,
                 symbol TEXT,
                 quantity INTEGER,
@@ -51,7 +52,7 @@ class Database:
         #Creating table for users trades
         self.cursor.execute("""
             CREATE TABLE trades (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                id INTEGER PRIMARY KEY AUTO_INCREMENT,
                 user_id INTEGER,
                 action TEXT, -- 'BUY' eller 'SELL'
                 symbol TEXT,
@@ -71,26 +72,16 @@ class Database:
 
         """)
 
-        # Create table for ticket
-        #self.cursor.execute("""
-        #    CREATE TABLE IF NOT EXISTS ticket (
-        #        ticketSymbol VARCHAR(30),
-        #        PRIMARY KEY (ticketSymbol),
-        #        FOREIGN KEY (ticketSymbol) REFERENCES stock(ticketSymbol)
-        #    );
-        #
-       # """)
-
         # Create table for stock prices with timeframes, opening prices etc
         self.cursor.execute("""
             CREATE TABLE IF NOT EXISTS price (
                 ticketSymbol VARCHAR(30),
                 timeframe VARCHAR(20),
                 date DATETIME,
-                open FLOAT,
-                high FLOAT,
-                low FLOAT,
-                close FLOAT,
+                open DECIMAL(10, 2),
+                high DECIMAL(10, 2),
+                low DECIMAL(10, 2),
+                close DECIMAL(10, 2),
                 volume BIGINT,
                 PRIMARY KEY (ticketSymbol, timeframe, date),
                 FOREIGN KEY (ticketSymbol) REFERENCES stock(ticketSymbol),
@@ -112,6 +103,24 @@ class Database:
                 INSERT IGNORE INTO timeframe (timeframe) VALUES (%s)
             """, (tf,))
         self.conn.commit()
+
+    #Creating user
+    def create_user(self, username, hashed_password):
+        try:
+            self.cursor.execute("INSERT INTO users (username, password) VALUES (%s, %s)", (username, hashed_password))
+            self.conn.commit()
+            return True
+        except Exception as e:
+            print(f"Failed to create user: {e}")
+            return False
+
+    # Get user 
+    def get_user_by_username(self, username):
+        self.cursor.execute("SELECT id, username, password FROM users WHERE username = %s", (username,))
+        row = self.cursor.fetchone()
+        return {"id": row[0], "username": row[1], "password": row[2]} if row else None
+
+
 
     # Adding cash to the user
     def add_cash_to_user(self, user_id, amount):
