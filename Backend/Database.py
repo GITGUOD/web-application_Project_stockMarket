@@ -25,6 +25,45 @@ class Database:
             );
         """)
 
+        # Creating table for users
+        self.cursor.execute("""
+            CREATE TABLE IF NOT EXISTS users (
+                    id INTEGER PRIMARY KEY AUTO_INCREMENT,
+                    username VARCHAR(255) UNIQUE,
+                    password VARCHAR(255),
+                    initial_cash DECIMAL(10, 2) DEFAULT 10000      
+                );
+                                
+                                
+                            """)
+        
+        # Creating table for users holding
+        self.cursor.execute("""
+            CREATE TABLE IF NOT EXISTS holding (
+                id INTEGER PRIMARY KEY AUTO_INCREMENT,
+                user_id INTEGER,
+                symbol VARCHAR(255),
+                quantity INTEGER,
+                avg_price DECIMAL(10, 2),
+                FOREIGN KEY(user_id) REFERENCES users(id)
+            );
+                            
+                            """)
+        #Creating table for users trades
+        self.cursor.execute("""
+            CREATE TABLE IF NOT EXISTS trades (
+                id INTEGER PRIMARY KEY AUTO_INCREMENT,
+                user_id INTEGER,
+                action VARCHAR(255), -- 'BUY' eller 'SELL'
+                symbol VARCHAR(255),
+                quantity INTEGER,
+                price DECIMAL(10, 2),
+                timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY(user_id) REFERENCES users(id)
+            );
+                            
+                            """)
+
          # Create table for timeframes
         self.cursor.execute("""
             CREATE TABLE IF NOT EXISTS timeframe (
@@ -33,26 +72,16 @@ class Database:
 
         """)
 
-        # Create table for ticket
-        #self.cursor.execute("""
-        #    CREATE TABLE IF NOT EXISTS ticket (
-        #        ticketSymbol VARCHAR(30),
-        #        PRIMARY KEY (ticketSymbol),
-        #        FOREIGN KEY (ticketSymbol) REFERENCES stock(ticketSymbol)
-        #    );
-        #
-       # """)
-
         # Create table for stock prices with timeframes, opening prices etc
         self.cursor.execute("""
             CREATE TABLE IF NOT EXISTS price (
                 ticketSymbol VARCHAR(30),
                 timeframe VARCHAR(20),
                 date DATETIME,
-                open FLOAT,
-                high FLOAT,
-                low FLOAT,
-                close FLOAT,
+                open DECIMAL(10, 2),
+                high DECIMAL(10, 2),
+                low DECIMAL(10, 2),
+                close DECIMAL(10, 2),
                 volume BIGINT,
                 PRIMARY KEY (ticketSymbol, timeframe, date),
                 FOREIGN KEY (ticketSymbol) REFERENCES stock(ticketSymbol),
@@ -75,6 +104,41 @@ class Database:
             """, (tf,))
         self.conn.commit()
 
+    #Creating user
+    def create_user(self, username, hashed_password):
+        try:
+            self.cursor.execute("INSERT INTO users (username, password) VALUES (%s, %s)", (username, hashed_password))
+            self.conn.commit()
+            return True
+        except Exception as e:
+            print(f"Failed to create user: {e}")
+            return False
+
+    # Get user 
+    def get_user_by_username(self, username):
+        self.cursor.execute("SELECT id, username, password FROM users WHERE username = %s", (username,))
+        row = self.cursor.fetchone()
+        return {"id": row[0], "username": row[1], "password": row[2]} if row else None
+
+
+
+    # Adding cash to the user
+    def add_cash_to_user(self, user_id, amount):
+        if amount <= 0:
+            return {"error": "Amount must be positive"}
+
+        # Check if user exists
+        self.cursor.execute("SELECT id FROM users WHERE id = %s", (user_id,))
+        if not self.cursor.fetchone():
+            return {"error": "User not found"}
+
+        self.cursor.execute("""
+            UPDATE users SET initial_cash = initial_cash + %s
+            WHERE id = %s
+        """, (amount, user_id))
+
+        self.conn.commit()
+        return {"success": f"Added ${amount:.2f} to user {user_id}"}
 
     #Inserting stocks
     def insert_ticker(self, symbol, name):
@@ -88,6 +152,103 @@ class Database:
         #    (symbol,)
         #)
         self.conn.commit()
+
+    def buy_stock(self, user_id, symbol, quantity, price):
+        total_cost = quantity * price
+
+        # Get user cash
+        self.cursor.execute("SELECT initial_cash FROM users WHERE id = %s", (user_id,))
+        row = self.cursor.fetchone()
+        if not row:
+            return {"error": "User not found"}
+        
+        current_cash = row[0]
+        if current_cash < total_cost:
+            return {"error": "Insufficient funds"}
+        
+        # Check if user already owns this stock
+        self.cursor.execute("""
+            SELECT quantity, avg_price FROM holding 
+            WHERE user_id = %s AND symbol = %s
+        """, (user_id, symbol))
+        holding = self.cursor.fetchone()
+
+        if holding:
+            old_qty, old_avg_price = holding
+            new_qty = old_qty + quantity
+            new_avg_price = ((old_qty * old_avg_price) + (quantity * price)) / new_qty
+
+            self.cursor.execute("""
+                UPDATE holding 
+                SET quantity = %s, avg_price = %s 
+                WHERE user_id = %s AND symbol = %s
+            """, (new_qty, new_avg_price, user_id, symbol))
+        else:
+            self.cursor.execute("""
+                INSERT INTO holding (user_id, symbol, quantity, avg_price)
+                VALUES (%s, %s, %s, %s)
+            """, (user_id, symbol, quantity, price))
+
+        # Deduct cash
+        self.cursor.execute("""
+            UPDATE users SET initial_cash = initial_cash - %s 
+            WHERE id = %s
+        """, (total_cost, user_id))
+
+        # Log the trade
+        self.cursor.execute("""
+            INSERT INTO trades (user_id, action, symbol, quantity, price) 
+            VALUES (%s, 'BUY', %s, %s, %s)
+        """, (user_id, symbol, quantity, price))
+
+        self.conn.commit()
+        return {"success": f"Bought {quantity} of {symbol} at {price}"}
+    
+
+    # Sell stock
+    def sell_stock(self, user_id, symbol, quantity, price):
+        total_value = quantity * price
+
+        # Check if user has this stock
+        self.cursor.execute("""
+            SELECT quantity, avg_price FROM holding
+            WHERE user_id = %s AND symbol = %s
+        """, (user_id, symbol))
+        holding = self.cursor.fetchone()
+
+        if not holding:
+            return {"error": f"You do not own any {symbol}"}
+
+        current_quantity, avg_price = holding
+        if quantity > current_quantity:
+            return {"error": f"Not enough shares to sell. You have {current_quantity}"}
+
+        # Update holdings or delete if selling all
+        if quantity == current_quantity:
+            self.cursor.execute("""
+                DELETE FROM holding WHERE user_id = %s AND symbol = %s
+            """, (user_id, symbol))
+        else:
+            new_quantity = current_quantity - quantity
+            self.cursor.execute("""
+                UPDATE holding SET quantity = %s WHERE user_id = %s AND symbol = %s
+            """, (new_quantity, user_id, symbol))
+
+        # Add cash to user's account
+        self.cursor.execute("""
+            UPDATE users SET initial_cash = initial_cash + %s
+            WHERE id = %s
+        """, (total_value, user_id))
+
+        # Log the trade
+        self.cursor.execute("""
+            INSERT INTO trades (user_id, action, symbol, quantity, price)
+            VALUES (%s, 'SELL', %s, %s, %s)
+        """, (user_id, symbol, quantity, price))
+
+        self.conn.commit()
+        return {"success": f"Sold {quantity} of {symbol} at {price}"}
+
 
         
 
