@@ -1,5 +1,6 @@
 from decimal import Decimal
-from flask import Flask, jsonify, render_template, request, session, redirect, url_for
+import decimal
+from flask import Flask, flash, jsonify, render_template, request, session, redirect, url_for
 from werkzeug.security import generate_password_hash, check_password_hash
 from Backend.Database import Database
 from Backend.API.MarketData import MarketData
@@ -183,6 +184,11 @@ def portfolio():
     user_id = session.get('user_id')
     if not user_id:
         return redirect('/login')  # Or handle appropriately
+    
+    # Fetch cash balance
+    db.cursor.execute("SELECT initial_cash FROM users WHERE id = %s", (user_id,))
+    cash_row = db.cursor.fetchone()
+    cash_balance = cash_row[0] if cash_row else 0
 
     db.cursor.execute("""
         SELECT h.symbol, h.quantity, h.avg_price, p.close
@@ -198,26 +204,111 @@ def portfolio():
     
     rows = db.cursor.fetchall()
     portfolio = []
+    total_stock_value = Decimal('0.0')
+    total_pnl = Decimal('0.0')
 
     for symbol, quantity, avg_price, current_price in rows:
-
+    
         avg_price = Decimal(avg_price)
         current_price = Decimal(str(current_price))
         quantity = Decimal(quantity)
-    
+
+
         pnl = (Decimal(str(current_price)) - avg_price) * quantity
+        total_pnl += pnl
+
+
+        try:
+            pnl_percent = ((Decimal(str(current_price)) - avg_price) / avg_price) * 100
+        except (decimal.DivisionByZero, ZeroDivisionError):
+            pnl_percent = Decimal('0.0')
+
+        total_stock_value += current_price * quantity
+
+            
         portfolio.append({
             'symbol': symbol,
             'quantity': quantity,
             'avg_price': avg_price,
             'current_price': current_price,
-            'pnl': pnl
+            'pnl': pnl,
+            'pnl_percent': pnl_percent
+
         })
 
-    return render_template('portfolio.html', portfolio=portfolio)
+    total_portfolio_value = cash_balance + total_stock_value
 
 
+    return render_template('portfolio.html', portfolio=portfolio, cash_balance=cash_balance, total_portfolio_value=total_portfolio_value, total_pnl=total_pnl)
+
+
+@app.route('/add_cash', methods=['POST'])
+def add_cash():
+    user_id = session.get('user_id')
+    if not user_id:
+        flash("Du måste vara inloggad för att lägga till cash.", "error")
+        return redirect(url_for('portfolio'))
+
+    amount_str = request.form.get('amount')
+    if not amount_str:
+        flash("Ingen summa angavs.", "error")
+        return redirect(url_for('portfolio'))
     
+    try:
+        amount = float(amount_str)
+    except ValueError:
+        flash("Felaktig summa angavs.", "error")
+        return redirect(url_for('portfolio'))
+
+    if amount <= 0:
+        flash("Summan måste vara positiv.", "error")
+        return redirect(url_for('portfolio'))
+
+    result = db.add_cash_to_user(user_id, amount)
+    if "error" in result:
+        flash(result["error"], "error")
+    else:
+        flash(result["success"], "success")
+
+    return redirect(url_for('portfolio'))
+
+@app.route('/delete_account', methods=['GET', 'POST'])
+def delete_account():
+    user_id = session.get('user_id')
+    if not user_id:
+        flash("You must be logged in to delete your account.", "error")
+        return redirect(url_for('login'))
+
+    if request.method == 'POST':
+        password = request.form.get('password')
+
+        # Get user's hashed password from DB
+        db.cursor.execute("SELECT password FROM users WHERE id = %s", (user_id,))
+        row = db.cursor.fetchone()
+        if not row:
+            flash("User not found.", "error")
+            return redirect(url_for('portfolio'))
+
+        stored_password_hash = row[0]
+
+        # Check password
+        if not check_password_hash(stored_password_hash, password):
+            flash("Incorrect password. Account deletion cancelled.", "error")
+            return redirect(url_for('delete_account'))
+
+        # Delete user data
+        db.cursor.execute("DELETE FROM holding WHERE user_id = %s", (user_id,))
+        db.cursor.execute("DELETE FROM users WHERE id = %s", (user_id,))
+        db.conn.commit()
+
+        # Clear session
+        session.clear()
+
+        flash("Your account has been deleted successfully.", "success")
+        return redirect(url_for('home'))
+
+    # GET request - show confirmation form
+    return render_template('confirm_delete.html')
 
 
 if __name__ == "__main__":
