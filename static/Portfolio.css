@@ -1,0 +1,26 @@
+.profit {
+    color: green;
+}
+
+.loss {
+    color: red;
+}
+
+.flashes {
+    list-style-type: none;
+    padding: 0;
+    margin: 1em 0;
+}
+.flashes li {
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+.flashes li.success {
+    background-color: #d4edda;
+    color: #155724;
+}
+.flashes li.error {
+    background-color: #f8d7da;
+    color: #721c24;
+}

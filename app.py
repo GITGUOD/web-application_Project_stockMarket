@@ -1,6 +1,6 @@
 from decimal import Decimal
 import decimal
-from flask import Flask, jsonify, render_template, request, session, redirect, url_for
+from flask import Flask, flash, jsonify, render_template, request, session, redirect, url_for
 from werkzeug.security import generate_password_hash, check_password_hash
 from Backend.Database import Database
 from Backend.API.MarketData import MarketData
@@ -235,14 +235,42 @@ def portfolio():
             'pnl_percent': pnl_percent
 
         })
-        
+
     total_portfolio_value = cash_balance + total_stock_value
 
 
     return render_template('portfolio.html', portfolio=portfolio, cash_balance=cash_balance, total_portfolio_value=total_portfolio_value, total_pnl=total_pnl)
 
 
+@app.route('/add_cash', methods=['POST'])
+def add_cash():
+    user_id = session.get('user_id')
+    if not user_id:
+        flash("Du måste vara inloggad för att lägga till cash.", "error")
+        return redirect(url_for('portfolio'))
+
+    amount_str = request.form.get('amount')
+    if not amount_str:
+        flash("Ingen summa angavs.", "error")
+        return redirect(url_for('portfolio'))
     
+    try:
+        amount = float(amount_str)
+    except ValueError:
+        flash("Felaktig summa angavs.", "error")
+        return redirect(url_for('portfolio'))
+
+    if amount <= 0:
+        flash("Summan måste vara positiv.", "error")
+        return redirect(url_for('portfolio'))
+
+    result = db.add_cash_to_user(user_id, amount)
+    if "error" in result:
+        flash(result["error"], "error")
+    else:
+        flash(result["success"], "success")
+
+    return redirect(url_for('portfolio'))
 
 
 if __name__ == "__main__":

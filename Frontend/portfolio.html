@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Your Portfolio</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='PnL.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='Portfolio.css') }}">
 
 </head>
 <body>
@@ -19,7 +19,12 @@
         ${{ "%.2f"|format(total_pnl) }}
     </span>
     </h2>
-
+    <form action="/add_cash" method="post">
+    <label for="amount">Add Cash:</label>
+    <input type="number" name="amount" id="amount" step="0.01" min="0.01" required>
+    <button type="submit">Add</button>
+    </form>
+    <br></br>
 
     <table border="1">
         <thead>
@@ -50,5 +55,15 @@
             {% endfor %}
         </tbody>
     </table>
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <ul class="flashes">
+      {% for category, message in messages %}
+        <li class="{{ category }}">{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+
 </body>
 </html>
