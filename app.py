@@ -279,36 +279,44 @@ def delete_account():
         flash("You must be logged in to delete your account.", "error")
         return redirect(url_for('login'))
 
-    if request.method == 'POST':
-        password = request.form.get('password')
+    
+    password = request.form.get('password')
 
-        # Get user's hashed password from DB
-        db.cursor.execute("SELECT password FROM users WHERE id = %s", (user_id,))
-        row = db.cursor.fetchone()
-        if not row:
-            flash("User not found.", "error")
-            return redirect(url_for('portfolio'))
+    if password is None:
+            flash("Password is required.", "error")
+            return redirect(url_for('confirm_delete'))
 
-        stored_password_hash = row[0]
+    # Get user's hashed password from DB
+    db.cursor.execute("SELECT password FROM users WHERE id = %s", (user_id,))
+    row = db.cursor.fetchone()
+    if not row:
+        flash("User not found.", "error")
+        return redirect(url_for('portfolio'))
 
-        # Check password
-        if not check_password_hash(stored_password_hash, password):
-            flash("Incorrect password. Account deletion cancelled.", "error")
-            return redirect(url_for('delete_account'))
+    stored_password_hash = row[0]
 
-        # Delete user data
-        db.cursor.execute("DELETE FROM holding WHERE user_id = %s", (user_id,))
-        db.cursor.execute("DELETE FROM users WHERE id = %s", (user_id,))
-        db.conn.commit()
+        
 
-        # Clear session
-        session.clear()
+    # Check password
+    if not check_password_hash(stored_password_hash, password):
+        flash("Incorrect password. Account deletion cancelled.", "error")
+        return redirect(url_for('confirm_delete'))
 
-        flash("Your account has been deleted successfully.", "success")
-        return redirect(url_for('home'))
+    # Delete user data
+    db.cursor.execute("DELETE FROM holding WHERE user_id = %s", (user_id,))
+    db.cursor.execute("DELETE FROM users WHERE id = %s", (user_id,))
+    db.conn.commit()
 
-    # GET request - show confirmation form
+    # Clear session
+    session.clear()
+
+    flash("Your account has been deleted successfully.", "success")
+    return redirect(url_for('home'))
+
+@app.route('/confirm_delete', methods=['GET'])
+def confirm_delete():
     return render_template('confirm_delete.html')
+
 
 
 if __name__ == "__main__":
