@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Your Portfolio</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='PnL.css') }}">
+
+</head>
+<body>
+    <h1>Your Portfolio</h1>
+    <a href="/" style="text-decoration: none;">
+    <button type="button">Back</button>
+    </a>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Symbol</th>
+                <th>Quantity</th>
+                <th>Avg. Buy Price</th>
+                <th>Current Price</th>
+                <th>PnL</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for stock in portfolio %}
+            <tr>
+                <td>{{ stock.symbol }}</td>
+                <td>{{ stock.quantity }}</td>
+                <td>{{ stock.avg_price }}</td>
+                <td>{{ stock.current_price }}</td>
+                <td class="{{ 'positive' if stock.pnl >= 0 else 'negative' }}">
+                    {{ "%.2f"|format(stock.pnl) }}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

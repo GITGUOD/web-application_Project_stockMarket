@@ -1,3 +1,4 @@
+from decimal import Decimal
 from flask import Flask, jsonify, render_template, request, session, redirect, url_for
 from werkzeug.security import generate_password_hash, check_password_hash
 from Backend.Database import Database
@@ -176,6 +177,44 @@ def sell():
 def get_session():
     user_id = session.get('user_id')
     return jsonify({'user_id': user_id})
+
+@app.route('/portfolio')
+def portfolio():
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect('/login')  # Or handle appropriately
+
+    db.cursor.execute("""
+        SELECT h.symbol, h.quantity, h.avg_price, p.close
+        FROM holding h
+        JOIN (
+            SELECT ticketSymbol, MAX(date) as max_date
+            FROM price
+            GROUP BY ticketSymbol
+        ) latest ON h.symbol = latest.ticketSymbol
+        JOIN price p ON p.ticketSymbol = latest.ticketSymbol AND p.date = latest.max_date
+        WHERE h.user_id = %s
+    """, (user_id,))
+    
+    rows = db.cursor.fetchall()
+    portfolio = []
+
+    for symbol, quantity, avg_price, current_price in rows:
+
+        avg_price = Decimal(avg_price)
+        current_price = Decimal(str(current_price))
+        quantity = Decimal(quantity)
+    
+        pnl = (Decimal(str(current_price)) - avg_price) * quantity
+        portfolio.append({
+            'symbol': symbol,
+            'quantity': quantity,
+            'avg_price': avg_price,
+            'current_price': current_price,
+            'pnl': pnl
+        })
+
+    return render_template('portfolio.html', portfolio=portfolio)
 
 
     
