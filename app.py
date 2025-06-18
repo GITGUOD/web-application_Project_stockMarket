@@ -272,7 +272,7 @@ def add_cash():
 
     return redirect(url_for('portfolio'))
 
-@app.route('/delete_account', methods=['GET', 'POST'])
+@app.route('/delete_account', methods=['POST'])
 def delete_account():
     user_id = session.get('user_id')
     if not user_id:
