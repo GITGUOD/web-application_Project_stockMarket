@@ -272,6 +272,44 @@ def add_cash():
 
     return redirect(url_for('portfolio'))
 
+@app.route('/delete_account', methods=['GET', 'POST'])
+def delete_account():
+    user_id = session.get('user_id')
+    if not user_id:
+        flash("You must be logged in to delete your account.", "error")
+        return redirect(url_for('login'))
+
+    if request.method == 'POST':
+        password = request.form.get('password')
+
+        # Get user's hashed password from DB
+        db.cursor.execute("SELECT password FROM users WHERE id = %s", (user_id,))
+        row = db.cursor.fetchone()
+        if not row:
+            flash("User not found.", "error")
+            return redirect(url_for('portfolio'))
+
+        stored_password_hash = row[0]
+
+        # Check password
+        if not check_password_hash(stored_password_hash, password):
+            flash("Incorrect password. Account deletion cancelled.", "error")
+            return redirect(url_for('delete_account'))
+
+        # Delete user data
+        db.cursor.execute("DELETE FROM holding WHERE user_id = %s", (user_id,))
+        db.cursor.execute("DELETE FROM users WHERE id = %s", (user_id,))
+        db.conn.commit()
+
+        # Clear session
+        session.clear()
+
+        flash("Your account has been deleted successfully.", "success")
+        return redirect(url_for('home'))
+
+    # GET request - show confirmation form
+    return render_template('confirm_delete.html')
+
 
 if __name__ == "__main__":
     main()

@@ -3,6 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title>Your Portfolio</title>
+    <form action="{{ url_for('delete_account') }}" method="get" onsubmit="return confirm('Are you sure you want to delete your account? This action cannot be undone.')">
+    <button type="submit" style="background-color: red; color: white;">Delete Account</button>
+    </form>
+
     <link rel="stylesheet" href="{{ url_for('static', filename='Portfolio.css') }}">
 
 </head>
