@@ -11,6 +11,16 @@
     <a href="/" style="text-decoration: none;">
     <button type="button">Back</button>
     </a>
+    <h2>Cash Balance: ${{ "%.2f"|format(cash_balance) }}</h2>
+    <h2>Total Portfolio Value: ${{ "%.2f"|format(total_portfolio_value) }}</h2>
+    <h2>
+    Total PnL: 
+    <span class="{{ 'positive' if total_pnl >= 0 else 'negative' }}">
+        ${{ "%.2f"|format(total_pnl) }}
+    </span>
+    </h2>
+
+
     <table border="1">
         <thead>
             <tr>
@@ -19,6 +29,8 @@
                 <th>Avg. Buy Price</th>
                 <th>Current Price</th>
                 <th>PnL</th>
+                <th>PnL %</th>
+
             </tr>
         </thead>
         <tbody>
@@ -30,6 +42,9 @@
                 <td>{{ stock.current_price }}</td>
                 <td class="{{ 'positive' if stock.pnl >= 0 else 'negative' }}">
                     {{ "%.2f"|format(stock.pnl) }}
+                </td>
+                <td class="{{ 'positive' if stock.pnl_percent >= 0 else 'negative' }}">
+                    {{ "%.2f"|format(stock.pnl_percent) }}%
                 </td>
             </tr>
             {% endfor %}
