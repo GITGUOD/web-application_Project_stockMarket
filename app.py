@@ -21,9 +21,7 @@ def main():
     ("1y", "1d"), # daily over 1 year
     ("3mo", "1d"),
     ("3mo", "1h"), 
-    ("1mo", "1h"),
-    ("5d", "30m"),    # 30min over 1 week etc
-    ("5d", "15m")     # 15-minute data over 5 days
+    ("1mo", "1h")
     ]
 
     market_data.load_sample_tickers()
@@ -323,14 +321,14 @@ def delete_account():
 def confirm_delete():
     return render_template('confirm_delete.html')
 
-@app.route("/predictions")
+@app.route("/predictions", methods=['GET'])
 def predictions():
     symbols = market_data.get_samples()
 
 
     predictions = []
 
-    for symbol in symbols:
+    for symbol, _ in symbols:
         timeframe = request.args.get('timeframe', '1d')
         df = get_price_history_from_db(db, symbol, timeframe)
         df = prepare_features(df)
@@ -340,6 +338,8 @@ def predictions():
         except FileNotFoundError:
             trend = "Model not trained"
         predictions.append({"symbol": symbol, "prediction": trend})
+    
+    print(predictions)
 
     return render_template("predictions.html", predictions=predictions)
 
