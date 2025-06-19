@@ -4,6 +4,11 @@ from flask import Flask, flash, jsonify, render_template, request, session, redi
 from werkzeug.security import generate_password_hash, check_password_hash
 from Backend.Database import Database
 from Backend.API.MarketData import MarketData
+from Backend.MLModel.predictor import predict_next
+from Backend.MLModel.util import prepare_features
+from Backend.MLModel.helpers import get_price_history_from_db
+import joblib
+
 
 def main():
     db = Database()
@@ -29,6 +34,7 @@ def main():
 app = Flask(__name__, template_folder='frontend')
 app.secret_key = "3f1cbe6d08b349a996fd5dcbdb876a78"
 db = Database()
+market_data = MarketData(db)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -317,7 +323,25 @@ def delete_account():
 def confirm_delete():
     return render_template('confirm_delete.html')
 
+@app.route("/predictions")
+def predictions():
+    symbols = market_data.get_samples()
 
+
+    predictions = []
+
+    for symbol in symbols:
+        timeframe = request.args.get('timeframe', '1d')
+        df = get_price_history_from_db(db, symbol, timeframe)
+        df = prepare_features(df)
+        try:
+            model = joblib.load(f'models/{symbol.lower()}_model.pkl')
+            trend = predict_next(df, model)
+        except FileNotFoundError:
+            trend = "Model not trained"
+        predictions.append({"symbol": symbol, "prediction": trend})
+
+    return render_template("predictions.html", predictions=predictions)
 
 if __name__ == "__main__":
     main()
