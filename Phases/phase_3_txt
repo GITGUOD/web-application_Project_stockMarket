@@ -1,0 +1,137 @@
+Added a new folder: MachineLearningModel
+Three new classes or moduls:
+Predictor, predicts the price
+Trainer, trains the models and saves it
+util, where all our data lies
+
+Added a html file predictions
+added a flask route in app to be able to utilize that html fil
+
+installing all the neccessary packages:
+
+pip install ta joblib scikit-learn pandas numpy
+
+to confirm: python -c "import ta, joblib, sklearn, pandas, numpy; print('All good!')"
+
+python train_all_models.py to train the models 
+
+python app.py to run the application
+
+Now all of this is now displayed.
+
+PS C:\Users\tonny\OneDrive - Lund University\Skrivbordet\personalProjects\stockMarket_App\web-application_Project_stockMarket> python train_all_models.py
+Training model for MSFT timeframe 1d...
+Model R^2 score: 0.9557
+Model saved to models/msft_1d_model.pkl
+Model trained and saved for MSFT timeframe 1d
+Training model for MSFT timeframe 1wk...
+Model R^2 score: 0.9001
+Model saved to models/msft_1wk_model.pkl
+Model trained and saved for MSFT timeframe 1wk
+Training model for MSFT timeframe 1mo...
+Model R^2 score: -0.1638
+Model saved to models/msft_1mo_model.pkl
+Model trained and saved for MSFT timeframe 1mo
+Training model for MSFT timeframe 1h...
+Model R^2 score: 0.9508
+Model saved to models/msft_1h_model.pkl
+Model trained and saved for MSFT timeframe 1h
+Training model for AAPL timeframe 1d...
+Model R^2 score: 0.5559
+Model saved to models/aapl_1d_model.pkl
+Model trained and saved for AAPL timeframe 1d
+Training model for AAPL timeframe 1wk...
+Model R^2 score: 0.8934
+Model saved to models/aapl_1wk_model.pkl
+Model trained and saved for AAPL timeframe 1wk
+Training model for AAPL timeframe 1mo...
+Model R^2 score: 0.6756
+Model saved to models/aapl_1mo_model.pkl
+Model trained and saved for AAPL timeframe 1mo
+Training model for AAPL timeframe 1h...
+Model R^2 score: 0.8772
+Model saved to models/aapl_1h_model.pkl
+Model trained and saved for AAPL timeframe 1h
+Training model for GOOG timeframe 1d...
+Model R^2 score: 0.8519
+Model saved to models/goog_1d_model.pkl
+Model trained and saved for GOOG timeframe 1d
+Training model for GOOG timeframe 1wk...
+Model R^2 score: 0.8911
+Model saved to models/goog_1wk_model.pkl
+Model trained and saved for GOOG timeframe 1wk
+Training model for GOOG timeframe 1mo...
+Model R^2 score: 0.0457
+Model saved to models/goog_1mo_model.pkl
+Model trained and saved for GOOG timeframe 1mo
+Training model for GOOG timeframe 1h...
+Model R^2 score: 0.9353
+Model saved to models/goog_1h_model.pkl
+Model trained and saved for GOOG timeframe 1h
+Training model for TSLA timeframe 1d...
+Model R^2 score: 0.8820
+Model saved to models/tsla_1d_model.pkl
+Model trained and saved for TSLA timeframe 1d
+Training model for TSLA timeframe 1wk...
+Model R^2 score: 0.9104
+Model saved to models/tsla_1wk_model.pkl
+Model trained and saved for TSLA timeframe 1wk
+Training model for TSLA timeframe 1mo...
+Model R^2 score: 0.4949
+Model saved to models/tsla_1mo_model.pkl
+Model trained and saved for TSLA timeframe 1mo
+Training model for TSLA timeframe 1h...
+Model R^2 score: 0.9200
+Model saved to models/tsla_1h_model.pkl
+Model trained and saved for TSLA timeframe 1h
+Training model for NVDA timeframe 1d...
+Model R^2 score: 0.9536
+Model saved to models/nvda_1d_model.pkl
+Model trained and saved for NVDA timeframe 1d
+Training model for NVDA timeframe 1wk...
+Model R^2 score: 0.9554
+Model saved to models/nvda_1wk_model.pkl
+Model trained and saved for NVDA timeframe 1wk
+Training model for NVDA timeframe 1mo...
+Model R^2 score: -0.1014
+Model saved to models/nvda_1mo_model.pkl
+Model trained and saved for NVDA timeframe 1mo
+Training model for NVDA timeframe 1h...
+Model R^2 score: 0.8421
+Model saved to models/nvda_1h_model.pkl
+Model trained and saved for NVDA timeframe 1h
+Training model for AMZN timeframe 1d...
+Model R^2 score: 0.9097
+Model saved to models/amzn_1d_model.pkl
+Model trained and saved for AMZN timeframe 1d
+Training model for AMZN timeframe 1wk...
+Model R^2 score: 0.9393
+Model saved to models/amzn_1wk_model.pkl
+Model trained and saved for AMZN timeframe 1wk
+Training model for AMZN timeframe 1mo...
+Model R^2 score: 0.4914
+Model saved to models/amzn_1mo_model.pkl
+Model trained and saved for AMZN timeframe 1mo
+Training model for AMZN timeframe 1h...
+Model R^2 score: 0.9200
+Model saved to models/amzn_1h_model.pkl
+Model trained and saved for AMZN timeframe 1h
+Training model for VOLCAR-B.ST timeframe 1d...
+Model R^2 score: 0.5497
+Model saved to models/volcar-b.st_1d_model.pkl
+Model trained and saved for VOLCAR-B.ST timeframe 1d
+Training model for VOLCAR-B.ST timeframe 1wk...
+Model R^2 score: 0.7827
+Model saved to models/volcar-b.st_1wk_model.pkl
+Model trained and saved for VOLCAR-B.ST timeframe 1wk
+Training model for VOLCAR-B.ST timeframe 1mo...
+Model R^2 score: -7.2168
+Model saved to models/volcar-b.st_1mo_model.pkl
+Model trained and saved for VOLCAR-B.ST timeframe 1mo
+Training model for VOLCAR-B.ST timeframe 1h...
+Model R^2 score: 0.9368
+Model saved to models/volcar-b.st_1h_model.pkl
+Model trained and saved for VOLCAR-B.ST timeframe 1h¨
+    
+
+And a model or pkl file for each trained stock is now saved
