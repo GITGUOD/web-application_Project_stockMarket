@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Stock Predictions</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='predictions.css') }}">
+
+</head>
+<body>
+    <h2 style="text-align:center;">Stock Trend Predictions</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Symbol</th>
+                <th>Prediction</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in predictions %}
+            <tr>
+                <td>{{ item.symbol }}</td>
+                <td class="{{ 'up' if item.prediction == 'Up' else 'down' }}">{{ item.prediction }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

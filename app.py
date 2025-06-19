@@ -4,6 +4,11 @@ from flask import Flask, flash, jsonify, render_template, request, session, redi
 from werkzeug.security import generate_password_hash, check_password_hash
 from Backend.Database import Database
 from Backend.API.MarketData import MarketData
+from Backend.MLModel.predictor import predict_next
+from Backend.MLModel.util import prepare_features
+from Backend.MLModel.helpers import get_price_history_from_db
+import joblib
+
 
 def main():
     db = Database()
@@ -16,9 +21,7 @@ def main():
     ("1y", "1d"), # daily over 1 year
     ("3mo", "1d"),
     ("3mo", "1h"), 
-    ("1mo", "1h"),
-    ("5d", "30m"),    # 30min over 1 week etc
-    ("5d", "15m")     # 15-minute data over 5 days
+    ("1mo", "1h")
     ]
 
     market_data.load_sample_tickers()
@@ -29,6 +32,7 @@ def main():
 app = Flask(__name__, template_folder='frontend')
 app.secret_key = "3f1cbe6d08b349a996fd5dcbdb876a78"
 db = Database()
+market_data = MarketData(db)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -317,7 +321,30 @@ def delete_account():
 def confirm_delete():
     return render_template('confirm_delete.html')
 
+@app.route("/predictions", methods=['GET'])
+def predictions():
+    timeframe = request.args.get('timeframe', '1d')  # default to 1d if not provided
+    symbols = market_data.get_samples()
 
+    predictions = []
+
+    for symbol, _ in symbols:
+        df = get_price_history_from_db(db, symbol, timeframe)
+        X, y = prepare_features(df)
+        if X is None or len(X) == 0:
+            trend = "No data"
+        else:
+            try:
+                model_path = f'models/{symbol.lower()}_{timeframe}_model.pkl'
+                trend = predict_next(df, model_path)
+
+            except FileNotFoundError:
+                trend = "Model not trained"
+        predictions.append({"symbol": symbol, "prediction": trend})
+
+    print(predictions)
+
+    return render_template("predictions.html", predictions=predictions, timeframe=timeframe)
 
 if __name__ == "__main__":
     main()
