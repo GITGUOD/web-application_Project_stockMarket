@@ -323,25 +323,28 @@ def confirm_delete():
 
 @app.route("/predictions", methods=['GET'])
 def predictions():
+    timeframe = request.args.get('timeframe', '1d')  # default to 1d if not provided
     symbols = market_data.get_samples()
-
 
     predictions = []
 
     for symbol, _ in symbols:
-        timeframe = request.args.get('timeframe', '1d')
         df = get_price_history_from_db(db, symbol, timeframe)
-        df = prepare_features(df)
-        try:
-            model = joblib.load(f'models/{symbol.lower()}_model.pkl')
-            trend = predict_next(df, model)
-        except FileNotFoundError:
-            trend = "Model not trained"
+        X, y = prepare_features(df)
+        if X is None or len(X) == 0:
+            trend = "No data"
+        else:
+            try:
+                model_path = f'models/{symbol.lower()}_{timeframe}_model.pkl'
+                trend = predict_next(df, model_path)
+
+            except FileNotFoundError:
+                trend = "Model not trained"
         predictions.append({"symbol": symbol, "prediction": trend})
-    
+
     print(predictions)
 
-    return render_template("predictions.html", predictions=predictions)
+    return render_template("predictions.html", predictions=predictions, timeframe=timeframe)
 
 if __name__ == "__main__":
     main()

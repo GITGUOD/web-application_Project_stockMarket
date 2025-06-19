@@ -19,7 +19,7 @@ python app.py to run the application
 
 Now all of this is now displayed.
 
-PS C:\Users\tonny\OneDrive - Lund University\Skrivbordet\personalProjects\stockMarket_App\web-application_Project_stockMarket> python train_all_models.py
+python train_all_models.py
 Training model for MSFT timeframe 1d...
 Model R^2 score: 0.9557
 Model saved to models/msft_1d_model.pkl
