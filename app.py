@@ -339,10 +339,12 @@ def predictions():
                 predicted_price  = predict_next(df, model_path)
                 last_price = df['Close'].iloc[-1]
                 trend = "Up" if predicted_price > last_price else "Down"
+                change_pct = ((predicted_price - last_price) / last_price) * 100
 
             except FileNotFoundError:
                 trend = "Model not trained"
-        predictions.append({"symbol": symbol, "prediction": trend, "predicted_price": round(predicted_price, 2), "current_price": round(last_price, 2)
+
+        predictions.append({"symbol": symbol, "prediction": trend, "predicted_price": round(predicted_price, 2), "current_price": round(last_price, 2), "change_pct": round(change_pct, 2)
 })
 
     print(predictions)
