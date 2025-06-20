@@ -323,7 +323,7 @@ def confirm_delete():
 
 @app.route("/predictions", methods=['GET'])
 def predictions():
-    timeframe = request.args.get('timeframe', '1d')  # default to 1d if not provided
+    timeframe = request.args.get('timeframe', '1mo')  # default to 1d if not provided, change if needed
     symbols = market_data.get_samples()
 
     predictions = []
@@ -336,11 +336,14 @@ def predictions():
         else:
             try:
                 model_path = f'models/{symbol.lower()}_{timeframe}_model.pkl'
-                trend = predict_next(df, model_path)
+                predicted_price  = predict_next(df, model_path)
+                last_price = df['Close'].iloc[-1]
+                trend = "Up" if predicted_price > last_price else "Down"
 
             except FileNotFoundError:
                 trend = "Model not trained"
-        predictions.append({"symbol": symbol, "prediction": trend})
+        predictions.append({"symbol": symbol, "prediction": trend, "predicted_price": round(predicted_price, 2), "current_price": round(last_price, 2)
+})
 
     print(predictions)
 

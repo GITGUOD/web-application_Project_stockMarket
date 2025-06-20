@@ -12,14 +12,19 @@
         <thead>
             <tr>
                 <th>Symbol</th>
-                <th>Prediction</th>
+                <th>Current Price</th>
+                <th>Predicted trend</th>
+                <th>Predicted Price</th>
+
             </tr>
         </thead>
         <tbody>
             {% for item in predictions %}
             <tr>
                 <td>{{ item.symbol }}</td>
+                <td>{{ item.current_price }}</td>
                 <td class="{{ 'up' if item.prediction == 'Up' else 'down' }}">{{ item.prediction }}</td>
+                <td class="{{ 'up' if item.prediction == 'Up' else 'down' }}">{{ item.predicted_price }}</td>
             </tr>
             {% endfor %}
         </tbody>
