@@ -15,15 +15,15 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='StockSite.css') }}">
 
     <form action="/logout" method="post">
-    <button type="submit">Logout</button>
+    <button type="submit" class="btn btn-logout">Logout</button>
     </form>
 
     <form action="/portfolio" method="get">
-    <button type="submit">View Portfolio</button>
+    <button type="submit" class="btn btn-portfolio" >View Portfolio</button>
     </form>
 
     <form action="/predictions" method="get">
-    <button type="submit">View predictions</button>
+    <button type="submit" class="btn btn-prediction">View predictions</button>
     </form>
 
 

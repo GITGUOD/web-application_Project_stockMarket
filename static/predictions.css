@@ -15,7 +15,7 @@ th, td {
         border: 1px solid #ddd;
 }
 th {
-        background-color: #007BFF;
+        background-color: black;
         color: white;
         }
 tr:nth-child(even) {
@@ -31,3 +31,8 @@ tr:nth-child(even) {
         color: red;
         font-weight: bold;
 }
+
+body {
+        background-color: gray;
+}
+
