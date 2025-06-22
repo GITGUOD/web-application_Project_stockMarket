@@ -10,6 +10,8 @@ services:
       - DB_USER=root
       - DB_PASSWORD=Tonny2002
       - DB_NAME=stockdb
+      - FLASK_APP=app.py
+      - FLASK_ENV=development
     depends_on:
       - db
 
@@ -20,7 +22,7 @@ services:
       MYSQL_ROOT_PASSWORD: Tonny2002
       MYSQL_DATABASE: stockdb
     ports:
-      - "3306:3306"
+      - "3300:3300"
     volumes:
       - db_data:/var/lib/mysql
 

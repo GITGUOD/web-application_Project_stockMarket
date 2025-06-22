@@ -1,14 +1,16 @@
 from decimal import Decimal
 import mysql.connector
+import os
 
 class Database:
 
     #Initiating db
-    def __init__(self, host="localhost", user="root", password="Tonny2002", database="stockdb"):
+    def __init__(self):
         self.conn =mysql.connector.connect(
-            host=host,
-            user=user,
-            password=password  # MySQL password/code
+            host=os.getenv("DB_HOST", "localhost"),
+            user=os.getenv("DB_USER", "root"),
+            password=os.getenv("DB_PASSWORD", ""),
+            database=os.getenv("DB_NAME", "stockdb")
         )
 
         #Variable for the db connection
