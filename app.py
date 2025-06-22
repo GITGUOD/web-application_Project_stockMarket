@@ -29,7 +29,7 @@ def main():
     db.close()
 
 #Hämtar html filen
-app = Flask(__name__, template_folder='frontend')
+app = Flask(__name__, template_folder='Frontend')
 app.secret_key = "3f1cbe6d08b349a996fd5dcbdb876a78"
 db = Database()
 market_data = MarketData(db)
@@ -333,6 +333,7 @@ def predictions():
         X, y = prepare_features(df)
         if X is None or len(X) == 0:
             trend = "No data"
+            # Här finns inget predicted_price satt!
         else:
             try:
                 model_path = f'models/{symbol.lower()}_{timeframe}_model.pkl'
@@ -343,9 +344,16 @@ def predictions():
 
             except FileNotFoundError:
                 trend = "Model not trained"
+                # predicted_price sätts inte här heller
 
-        predictions.append({"symbol": symbol, "prediction": trend, "predicted_price": round(predicted_price, 2), "current_price": round(last_price, 2), "change_pct": round(change_pct, 2)
-})
+        predictions.append({
+            "symbol": symbol,
+            "prediction": trend,
+            "predicted_price": round(predicted_price, 2),  # här kraschar det om predicted_price inte är satt
+            "current_price": round(last_price, 2),
+            "change_pct": round(change_pct, 2)
+        })
+
 
     print(predictions)
 
@@ -353,4 +361,4 @@ def predictions():
 
 if __name__ == "__main__":
     main()
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)

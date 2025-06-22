@@ -1,4 +1,5 @@
 from decimal import Decimal
+import time
 import mysql.connector
 import os
 
@@ -6,19 +7,35 @@ class Database:
 
     #Initiating db
     def __init__(self):
-        self.conn =mysql.connector.connect(
-            host=os.getenv("DB_HOST", "localhost"),
-            user=os.getenv("DB_USER", "root"),
-            password=os.getenv("DB_PASSWORD", ""),
-            database=os.getenv("DB_NAME", "stockdb")
-        )
+        self.host = os.getenv("DB_HOST", "localhost")
+        self.user = os.getenv("DB_USER", "root")
+        self.password = os.getenv("DB_PASSWORD", "")
+        self.database = os.getenv("DB_NAME", "stockdb")
+        self.port = int(os.getenv("DB_PORT", 3306))
+
+        for attempt in range(10):  # Försök 10 gånger med 3 sekunders mellanrum
+            try:
+                self.conn = mysql.connector.connect(
+                    host=self.host,
+                    user=self.user,
+                    password=self.password,
+                    port=self.port
+
+                )
+                print("✅ Database connection established.")
+                break
+            except mysql.connector.Error as err:
+                print(f"⏳ Attempt {attempt + 1}/10: Database not ready, retrying in 3s...")
+                time.sleep(3)
+        else:
+            raise Exception("❌ Could not connect to the database after 10 attempts.")
 
         #Variable for the db connection
         self.cursor = self.conn.cursor()
 
         # Create the database if it doesn't exist
-        self.cursor.execute(f"CREATE DATABASE IF NOT EXISTS {database}")
-        self.conn.database = database  # Connect to the database
+        self.cursor.execute(f"CREATE DATABASE IF NOT EXISTS {self.database}")
+        self.conn.database = self.database  # Connect to the database
 
         # Create the table "stock" which will be used to add stocks if it doesn't exist
         self.cursor.execute("""
