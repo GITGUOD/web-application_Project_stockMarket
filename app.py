@@ -333,27 +333,22 @@ def predictions():
         X, y = prepare_features(df)
         if X is None or len(X) == 0:
             trend = "No data"
-            # Här finns inget predicted_price satt!
         else:
             try:
                 model_path = f'models/{symbol.lower()}_{timeframe}_model.pkl'
                 predicted_price  = predict_next(df, model_path)
                 last_price = df['Close'].iloc[-1]
                 trend = "Up" if predicted_price > last_price else "Down"
-                change_pct = ((predicted_price - last_price) / last_price) * 100
+                change_pct = ((predicted_price - float(last_price)) / float(last_price)) * 100
 
             except FileNotFoundError:
                 trend = "Model not trained"
-                # predicted_price sätts inte här heller
+                predicted_price = 0.0
+                last_price = df['Close'].iloc[-1] if 'Close' in df else 0.0
+                change_pct = 0.0
 
-        predictions.append({
-            "symbol": symbol,
-            "prediction": trend,
-            "predicted_price": round(predicted_price, 2),  # här kraschar det om predicted_price inte är satt
-            "current_price": round(last_price, 2),
-            "change_pct": round(change_pct, 2)
-        })
-
+        predictions.append({"symbol": symbol, "prediction": trend, "predicted_price": round(predicted_price, 2), "current_price": round(last_price, 2), "change_pct": round(change_pct, 2)
+})
 
     print(predictions)
 

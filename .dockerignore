@@ -1,43 +1,12 @@
-__pycache__/
-
-*.pyc
-
-*.pyo
-
-*.pyd
-
-*.sqlite3
-
-*.db
-
-*.log
-
-*.DS_Store
-
-.env
-
-.env.*
-
-.vscode/
-
-.idea/
-
-*.swp
-
-*.bak
-
-instance/
-
-tests/
-
-*.egg-info/
-
-*.tgz
-dist/
-build/
+# Ignore node_modules folder
 node_modules/
 
-*.pkl
+# Optional: ignore environment files
+.env
 
-*.h5
-models/
+# Optional: ignore log files
+*.log
+
+# Optional: ignore build/output folders
+dist/
+build/
