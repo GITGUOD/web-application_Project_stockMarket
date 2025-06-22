@@ -1,0 +1,8 @@
+Flask==3.1.0
+mysql-connector-python
+pandas
+scikit-learn
+yfinance
+ta
+joblib
+numpy

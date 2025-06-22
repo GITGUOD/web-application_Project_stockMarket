@@ -29,7 +29,7 @@ def main():
     db.close()
 
 #Hämtar html filen
-app = Flask(__name__, template_folder='frontend')
+app = Flask(__name__, template_folder='Frontend')
 app.secret_key = "3f1cbe6d08b349a996fd5dcbdb876a78"
 db = Database()
 market_data = MarketData(db)
@@ -339,10 +339,13 @@ def predictions():
                 predicted_price  = predict_next(df, model_path)
                 last_price = df['Close'].iloc[-1]
                 trend = "Up" if predicted_price > last_price else "Down"
-                change_pct = ((predicted_price - last_price) / last_price) * 100
+                change_pct = ((predicted_price - float(last_price)) / float(last_price)) * 100
 
             except FileNotFoundError:
                 trend = "Model not trained"
+                predicted_price = 0.0
+                last_price = df['Close'].iloc[-1] if 'Close' in df else 0.0
+                change_pct = 0.0
 
         predictions.append({"symbol": symbol, "prediction": trend, "predicted_price": round(predicted_price, 2), "current_price": round(last_price, 2), "change_pct": round(change_pct, 2)
 })
@@ -353,4 +356,4 @@ def predictions():
 
 if __name__ == "__main__":
     main()
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)
